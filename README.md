@@ -48,4 +48,4 @@
 
 ---
 
-© 2024 Julian Vane Gastronomy. All rights reserved.
+© 2024 鑫寷家. All rights reserved.
