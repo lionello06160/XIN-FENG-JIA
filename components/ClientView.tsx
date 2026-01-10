@@ -164,8 +164,11 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
         <div className="px-4 py-8">
           <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
             <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
-            <p className="text-sm text-white/70 mb-6">{chefProfile.cta_description}</p>
-            {chefProfile.show_order_button && chefProfile.order_link && (
+            <p className="text-sm text-white/70">{chefProfile.cta_description}</p>
+          </div>
+
+          {chefProfile.show_order_button && chefProfile.order_link && (
+            <div className="px-2 pt-6">
               <a
                 href={chefProfile.order_link}
                 target="_blank"
@@ -175,8 +178,8 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
                 <ShoppingCart size={18} />
                 立即訂購
               </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <footer className="mt-8 border-t border-white/5 pt-10 pb-20 px-4 text-center">
@@ -204,12 +207,14 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
             <div className="w-32 h-1 bg-white/10 rounded-full"></div>
           </div>
         </footer>
-      </main>
+      </main >
 
       {/* Modal Overlay */}
-      {selectedDish && (
-        <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} />
-      )}
-    </div>
+      {
+        selectedDish && (
+          <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} />
+        )
+      }
+    </div >
   );
 };
