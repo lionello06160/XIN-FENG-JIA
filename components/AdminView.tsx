@@ -89,14 +89,10 @@ export const AdminDashboard = ({
 
       <main className="flex-1 w-full max-w-md mx-auto pb-24">
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-3 px-4 py-4">
-          <Link to="/admin/dish/new" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-admin-primary text-white gap-2 shadow-lg shadow-admin-primary/20 hover:scale-[0.98] transition-transform active:scale-95">
-            <PlusCircle size={32} />
-            <span className="truncate font-bold text-sm tracking-wide">新增菜色</span>
-          </Link>
-          <Link to="/admin/analytics" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95">
-            <BarChart size={32} className="text-admin-primary" />
-            <span className="truncate font-bold text-sm tracking-wide">數據分析報表</span>
+        <div className="px-4 py-4">
+          <Link to="/admin/dish/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
+            <PlusCircle size={24} />
+            <span className="font-bold tracking-wide">新增菜色</span>
           </Link>
         </div>
 
