@@ -23,6 +23,8 @@ export interface ChefProfile {
   };
   cta_title?: string;
   cta_description?: string;
+  order_link?: string;
+  show_order_button?: boolean;
 }
 
 export interface AppContextType {

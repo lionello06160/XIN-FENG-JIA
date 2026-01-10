@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { uploadImage } from '../lib/supabase';
@@ -497,6 +497,39 @@ export const EditProfile = ({
             placeholder="例如：在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。"
           />
         </label>
+
+        <div className="flex flex-col gap-4 pt-2">
+          <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-3">
+              <ShoppingBag className="text-admin-primary" size={20} />
+              <div className="flex flex-col">
+                <span className="text-[#181411] font-medium">顯示立即訂購按鈕</span>
+                <span className="text-gray-400 text-xs">開啟後首頁將出現訂購按鈕</span>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={formData.show_order_button}
+                onChange={e => setFormData({ ...formData, show_order_button: e.target.checked })}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
+            </label>
+          </div>
+
+          {formData.show_order_button && (
+            <label className="flex flex-col w-full gap-1">
+              <p className="text-[#181411] text-sm font-medium px-1">訂購連結 (URL)</p>
+              <input
+                className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-12 px-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                value={formData.order_link}
+                onChange={e => setFormData({ ...formData, order_link: e.target.value })}
+                placeholder="例如：https://order.page/julian"
+              />
+            </label>
+          )}
+        </div>
       </div>
 
       <div className="mt-8 px-4">

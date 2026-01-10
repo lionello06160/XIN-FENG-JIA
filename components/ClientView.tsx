@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
-import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle } from 'lucide-react';
+import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface ClientViewProps {
@@ -164,7 +164,18 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
         <div className="px-4 py-8">
           <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
             <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
-            <p className="text-sm text-white/70 mb-2">{chefProfile.cta_description}</p>
+            <p className="text-sm text-white/70 mb-6">{chefProfile.cta_description}</p>
+            {chefProfile.show_order_button && chefProfile.order_link && (
+              <a
+                href={chefProfile.order_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={18} />
+                立即訂購
+              </a>
+            )}
           </div>
         </div>
 

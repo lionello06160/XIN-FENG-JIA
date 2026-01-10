@@ -58,7 +58,9 @@ const App: React.FC = () => {
               line: profileData.line || ''
             },
             cta_title: profileData.cta_title || '預約私廚體驗',
-            cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。'
+            cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
+            order_link: profileData.order_link || '',
+            show_order_button: !!profileData.show_order_button
           });
         }
 
@@ -156,7 +158,9 @@ const App: React.FC = () => {
       facebook: updatedProfile.socials?.facebook,
       line: updatedProfile.socials?.line,
       cta_title: updatedProfile.cta_title,
-      cta_description: updatedProfile.cta_description
+      cta_description: updatedProfile.cta_description,
+      order_link: updatedProfile.order_link,
+      show_order_button: updatedProfile.show_order_button
     };
 
     // Remove undefined fields
