@@ -178,7 +178,7 @@ export const AdminDashboard = ({
           <Utensils size={24} fill="currentColor" />
           <span className="text-[10px] font-bold">菜色管理</span>
         </button>
-        <button className="flex flex-col items-center gap-1 text-[#8a7560]">
+        <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/admin/analytics')}>
           <BarChart size={24} />
           <span className="text-[10px] font-medium">數據分析</span>
         </button>
