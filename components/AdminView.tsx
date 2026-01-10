@@ -691,7 +691,7 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
           <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">流量趨勢</h3>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+              <LineChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8a7560' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8a7560' }} />
@@ -699,7 +699,7 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                 />
-                <Legend verticalAlign="top" align="right" iconType="circle" />
+                <Legend verticalAlign="top" align="right" height={40} iconType="circle" />
                 <Line name="瀏覽量" type="monotone" dataKey="pageViews" stroke="#a67c52" strokeWidth={3} dot={{ r: 4, fill: '#a67c52' }} activeDot={{ r: 6 }} />
                 <Line name="點擊數" type="monotone" dataKey="dishClicks" stroke="#181411" strokeWidth={3} dot={{ r: 4, fill: '#181411' }} activeDot={{ r: 6 }} />
               </LineChart>
