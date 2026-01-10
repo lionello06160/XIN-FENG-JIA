@@ -1,4 +1,4 @@
-# 鑫寷家 · Julian Vane Gastronomy
+# 鑫蘴家 · Julian Vane Gastronomy
 
 <div align="center">
   <img width="1200" alt="Julian Vane Gastronomy Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
@@ -48,4 +48,4 @@
 
 ---
 
-© 2024 鑫寷家. All rights reserved.
+© 2024 鑫蘴家. All rights reserved.

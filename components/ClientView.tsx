@@ -104,7 +104,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
             <Utensils size={24} />
           </div>
           <h1 className="text-white text-lg font-bold leading-tight tracking-widest flex-1 text-center uppercase">
-            鑫寷家
+            鑫蘴家
           </h1>
           <div className="flex w-10 items-center justify-end">
             <Link to="/admin" className="text-gold hover:text-white transition-colors">
@@ -216,7 +216,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
             )}
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">
-            © 2024 鑫寷家
+            © 2024 鑫蘴家
           </p>
           <div className="mt-8 flex justify-center">
             <div className="w-32 h-1 bg-white/10 rounded-full"></div>

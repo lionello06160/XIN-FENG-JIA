@@ -77,7 +77,7 @@ export const AdminDashboard = ({
           <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-admin-primary" style={{ backgroundImage: `url("${chefProfile.image}")` }}></div>
         </div>
         <div className="flex flex-col flex-1 px-2">
-          <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">鑫寷家 · 管理後台</h2>
+          <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">鑫蘴家 · 管理後台</h2>
           <p className="text-[#8a7560] text-xs font-medium uppercase tracking-wider">主廚管理控制台</p>
         </div>
         <div className="flex w-12 items-center justify-end">
