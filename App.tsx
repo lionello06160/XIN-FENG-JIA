@@ -55,7 +55,8 @@ const App: React.FC = () => {
             socials: {
               instagram: profileData.instagram || '',
               facebook: profileData.facebook || '',
-              line: profileData.line || ''
+              line: profileData.line || '',
+              email: profileData.email || ''
             },
             cta_title: profileData.cta_title || '預約私廚體驗',
             cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
@@ -157,6 +158,7 @@ const App: React.FC = () => {
       instagram: updatedProfile.socials?.instagram,
       facebook: updatedProfile.socials?.facebook,
       line: updatedProfile.socials?.line,
+      email: updatedProfile.socials?.email,
       cta_title: updatedProfile.cta_title,
       cta_description: updatedProfile.cta_description,
       order_link: updatedProfile.order_link,

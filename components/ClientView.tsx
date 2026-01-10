@@ -209,6 +209,11 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
                 <MessageCircle size={24} />
               </a>
             )}
+            {chefProfile.socials.email && (
+              <a href={`mailto:${chefProfile.socials.email}`} className="bg-luxury-card p-3 rounded-full shadow-sm border border-gold/20 text-gold hover:bg-gold hover:text-black transition-colors">
+                <Mail size={24} />
+              </a>
+            )}
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">
             © 2024 鑫寷家

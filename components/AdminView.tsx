@@ -568,6 +568,18 @@ export const EditProfile = ({
               placeholder="LINE ID 或連結"
             />
           </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-600 rounded-lg text-white shrink-0">
+              <Mail size={20} />
+            </div>
+            <input
+              type="email"
+              className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-10 px-3 text-sm focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+              value={formData.socials.email}
+              onChange={e => setFormData({ ...formData, socials: { ...formData.socials, email: e.target.value } })}
+              placeholder="電子郵件 (例如: chef@example.com)"
+            />
+          </div>
         </div>
       </div>
 

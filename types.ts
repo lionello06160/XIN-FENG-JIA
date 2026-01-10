@@ -20,6 +20,7 @@ export interface ChefProfile {
     instagram: string;
     facebook: string;
     line: string;
+    email: string;
   };
   cta_title?: string;
   cta_description?: string;
