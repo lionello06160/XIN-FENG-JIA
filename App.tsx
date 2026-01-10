@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClientView } from './components/ClientView';
-import { AdminDashboard, EditDish, EditProfile } from './components/AdminView';
+import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard } from './components/AdminView';
 import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
 import { ChefProfile, Dish } from './types';
 import { supabase } from './lib/supabase';
@@ -218,6 +218,16 @@ const App: React.FC = () => {
           element={
             isAuthenticated ? (
               <EditProfile profile={chefProfile} onSave={handleUpdateProfile} />
+            ) : (
+              <Navigate to="/admin" replace />
+            )
+          }
+        />
+        <Route
+          path="/admin/analytics"
+          element={
+            isAuthenticated ? (
+              <AnalyticsDashboard dishes={dishes} />
             ) : (
               <Navigate to="/admin" replace />
             )

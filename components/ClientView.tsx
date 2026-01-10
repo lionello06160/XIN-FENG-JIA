@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
 import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackEvent } from '../lib/supabase';
 
 interface ClientViewProps {
   chefProfile: ChefProfile;
@@ -85,6 +86,15 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
 export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
 
+  React.useEffect(() => {
+    trackEvent('page_view');
+  }, []);
+
+  const handleDishClick = (dish: Dish) => {
+    setSelectedDish(dish);
+    trackEvent('dish_click', dish.id);
+  };
+
   return (
     <div className="min-h-screen bg-luxury-dark text-white font-sans selection:bg-gold selection:text-black">
       {/* Sticky Navigation */}
@@ -150,7 +160,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedDish(dish)}
+                  onClick={() => handleDishClick(dish)}
                   className="w-full py-3 bg-gold/10 border border-gold/30 text-gold rounded-xl text-sm font-bold active:bg-gold active:text-black hover:bg-gold hover:text-black transition-all"
                 >
                   查看詳情

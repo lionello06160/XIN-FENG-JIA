@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { uploadImage } from '../lib/supabase';
+import { uploadImage, supabase } from '../lib/supabase';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart as RechartsBarChart, Bar, Legend, Cell
+} from 'recharts';
 
 // --- Shared Components ---
 
@@ -93,6 +97,10 @@ export const AdminDashboard = ({
           <Link to="/admin/profile" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95">
             <UserCog size={32} className="text-admin-primary" />
             <span className="truncate font-bold text-sm tracking-wide">編輯主廚簡介</span>
+          </Link>
+          <Link to="/admin/analytics" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95 col-span-2">
+            <BarChart size={32} className="text-admin-primary" />
+            <span className="truncate font-bold text-sm tracking-wide">數據分析報表</span>
           </Link>
         </div>
 
@@ -582,5 +590,162 @@ export const EditProfile = ({
         </button>
       </div>
     </AdminLayout>
+  );
+};
+
+// --- Analytics Dashboard Component ---
+
+export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
+  const navigate = useNavigate();
+  const [events, setEvents] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [timeRange, setTimeRange] = React.useState<'day' | 'month' | 'year'>('day');
+
+  React.useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('analytics_events')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching analytics:', error);
+    } else {
+      setEvents(data || []);
+    }
+    setLoading(false);
+  };
+
+  const processChartData = () => {
+    const counts: Record<string, { pageViews: number; dishClicks: number }> = {};
+
+    events.forEach(event => {
+      const date = new Date(event.created_at);
+      let key = '';
+
+      if (timeRange === 'day') {
+        key = date.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' });
+      } else if (timeRange === 'month') {
+        key = date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric' });
+      } else {
+        key = date.getFullYear().toString();
+      }
+
+      if (!counts[key]) counts[key] = { pageViews: 0, dishClicks: 0 };
+      if (event.event_type === 'page_view') counts[key].pageViews++;
+      if (event.event_type === 'dish_click') counts[key].dishClicks++;
+    });
+
+    return Object.entries(counts).map(([name, data]) => ({ name, ...data }));
+  };
+
+  const getDishStats = () => {
+    const stats: Record<string, number> = {};
+    events.forEach(event => {
+      if (event.event_type === 'dish_click' && event.dish_id) {
+        stats[event.dish_id] = (stats[event.dish_id] || 0) + 1;
+      }
+    });
+
+    return Object.entries(stats)
+      .map(([id, count]) => {
+        const dish = dishes.find(d => d.id === id);
+        return { name: dish?.name || '未知菜色', count };
+      })
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const chartData = processChartData();
+  const dishStats = getDishStats();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-admin-bg">
+        <Loader2 className="animate-spin text-admin-primary" size={48} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-admin-bg font-display text-[#181411]">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md p-4 flex items-center gap-3 border-b border-gray-100">
+        <button onClick={() => navigate('/admin')} className="p-2 hover:bg-gray-100 rounded-lg">
+          <ArrowLeft size={24} />
+        </button>
+        <h2 className="text-lg font-bold">數據分析報表</h2>
+      </header>
+
+      <main className="max-w-md mx-auto p-4 flex flex-col gap-6 pb-24">
+        {/* Time Range Selector */}
+        <div className="flex bg-white p-1 rounded-xl border border-gray-100 shadow-sm">
+          {(['day', 'month', 'year'] as const).map(range => (
+            <button
+              key={range}
+              onClick={() => setTimeRange(range)}
+              className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${timeRange === range ? 'bg-admin-primary text-white' : 'text-gray-400 hover:text-[#181411]'
+                }`}
+            >
+              {range === 'day' ? '日' : range === 'month' ? '月' : '年'}
+            </button>
+          ))}
+        </div>
+
+        {/* Global Stats Chart */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">流量趨勢</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8a7560' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#8a7560' }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                />
+                <Legend verticalAlign="top" align="right" iconType="circle" />
+                <Line name="瀏覽量" type="monotone" dataKey="pageViews" stroke="#a67c52" strokeWidth={3} dot={{ r: 4, fill: '#a67c52' }} activeDot={{ r: 6 }} />
+                <Line name="點擊數" type="monotone" dataKey="dishClicks" stroke="#181411" strokeWidth={3} dot={{ r: 4, fill: '#181411' }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Dish Clicks Ranking */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">各產品點擊分析</h3>
+          <div className="flex flex-col gap-3">
+            {dishStats.length === 0 ? (
+              <p className="text-center text-gray-400 text-sm py-8">目前尚無點擊數據</p>
+            ) : (
+              dishStats.map((stat, idx) => (
+                <div key={idx} className="flex items-center justify-between group">
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className={`size-6 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 ${idx === 0 ? 'bg-admin-primary text-white' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                      {idx + 1}
+                    </div>
+                    <span className="text-sm font-medium truncate">{stat.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 bg-gray-100 rounded-full w-24 overflow-hidden hidden sm:block">
+                      <div
+                        className="h-full bg-admin-primary rounded-full transition-all duration-1000"
+                        style={{ width: `${(stat.count / dishStats[0].count) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-sm font-bold tabular-nums min-w-[32px] text-right">{stat.count}次</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };

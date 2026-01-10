@@ -32,3 +32,18 @@ export const uploadImage = async (file: File): Promise<string> => {
 
     return data.publicUrl;
 };
+
+// --- Analytics ---
+
+export const trackEvent = async (eventType: 'page_view' | 'dish_click', dishId?: string) => {
+    try {
+        const { error } = await supabase
+            .from('analytics_events')
+            .insert([
+                { event_type: eventType, dish_id: dishId }
+            ]);
+        if (error) console.warn('Analytics error:', error.message);
+    } catch (err) {
+        console.warn('Analytics failed:', err);
+    }
+};
