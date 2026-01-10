@@ -94,11 +94,7 @@ export const AdminDashboard = ({
             <PlusCircle size={32} />
             <span className="truncate font-bold text-sm tracking-wide">新增菜色</span>
           </Link>
-          <Link to="/admin/profile" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95">
-            <UserCog size={32} className="text-admin-primary" />
-            <span className="truncate font-bold text-sm tracking-wide">編輯主廚簡介</span>
-          </Link>
-          <Link to="/admin/analytics" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95 col-span-2">
+          <Link to="/admin/analytics" className="flex flex-col cursor-pointer items-center justify-center rounded-xl h-24 bg-white border border-gray-100 text-[#181411] gap-2 shadow-sm hover:bg-gray-50 hover:scale-[0.98] transition-transform active:scale-95">
             <BarChart size={32} className="text-admin-primary" />
             <span className="truncate font-bold text-sm tracking-wide">數據分析報表</span>
           </Link>
