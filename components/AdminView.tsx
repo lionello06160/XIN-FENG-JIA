@@ -342,6 +342,35 @@ export const EditDish = ({
             />
           </label>
 
+          <div className="flex flex-col w-full gap-3">
+            <p className="text-[#181411] text-sm font-bold tracking-wider">辣度等級</p>
+            <div className="flex gap-2">
+              {[0, 1, 2, 3].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setFormData({ ...formData, spiciness: level })}
+                  className={`flex-1 py-3 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${(formData.spiciness || 0) === level
+                      ? 'border-admin-primary bg-admin-primary/5 text-admin-primary'
+                      : 'border-gray-100 bg-white text-gray-400'
+                    }`}
+                >
+                  <span className="text-sm font-bold">
+                    {level === 0 ? '不辣' : level === 1 ? '小辣' : level === 2 ? '中辣' : '大辣'}
+                  </span>
+                  <div className="flex gap-0.5 h-4 items-center">
+                    {level === 0 ? (
+                      <span className="text-[10px] font-medium opacity-50">無</span>
+                    ) : (
+                      Array.from({ length: level }).map((_, i) => (
+                        <span key={i} className="text-sm">🌶️</span>
+                      ))
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <p className="text-[#181411] text-sm font-bold tracking-wider mb-3">供應狀態</p>
             <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">

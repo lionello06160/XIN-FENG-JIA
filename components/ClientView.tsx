@@ -151,7 +151,16 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">名稱</span>
-                    <p className="text-white text-lg font-bold leading-tight">{dish.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-white text-lg font-bold leading-tight">{dish.name}</p>
+                      {dish.spiciness && dish.spiciness > 0 && (
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: dish.spiciness }).map((_, i) => (
+                            <span key={i} className="text-sm">🌶️</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     {!dish.available && <span className="text-xs text-red-500 font-bold mt-1 inline-block border border-red-500 px-2 py-0.5 rounded">售罄</span>}
                   </div>
                   <div className="text-right">
