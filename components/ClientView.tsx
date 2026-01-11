@@ -216,7 +216,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
             )}
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">
-            © 2024 鑫蘴家
+            © 2019 鑫蘴家
           </p>
           <div className="mt-8 flex justify-center">
             <div className="w-32 h-1 bg-white/10 rounded-full"></div>

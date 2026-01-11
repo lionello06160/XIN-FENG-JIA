@@ -1,54 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/pwa-192x192.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#a67c52" />
-    <title>鑫蘴家</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Be+Vietnam+Pro:wght@400;500;700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              gold: '#d4af37',
-              'gold-light': '#f2d675',
-              'admin-primary': '#f27f0d',
-              'admin-bg': '#f8f7f5',
-              'admin-dark': '#221910',
-              'luxury-dark': '#121212',
-              'luxury-card': '#1e1e1e',
-            },
-            fontFamily: {
-              sans: ['Noto Sans TC', 'sans-serif'],
-              display: ['Be Vietnam Pro', 'sans-serif'],
-            },
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/pwa-192x192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#a67c52" />
+  <title>鑫蘴家</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Be+Vietnam+Pro:wght@400;500;700&family=Manrope:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: '#d4af37',
+            'gold-light': '#f2d675',
+            'admin-primary': '#f27f0d',
+            'admin-bg': '#f8f7f5',
+            'admin-dark': '#221910',
+            'luxury-dark': '#121212',
+            'luxury-card': '#1e1e1e',
+          },
+          fontFamily: {
+            sans: ['Noto Sans TC', 'sans-serif'],
+            display: ['Be Vietnam Pro', 'sans-serif'],
           },
         },
-      }
-    </script>
-    <style>
-      body {
-        margin: 0;
-        font-family: 'Noto Sans TC', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      /* Hide scrollbar for Chrome, Safari and Opera */
-      .no-scrollbar::-webkit-scrollbar {
-          display: none;
-      }
-      /* Hide scrollbar for IE, Edge and Firefox */
-      .no-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-      }
-    </style>
+      },
+    }
+  </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans TC', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      /* IE and Edge */
+      scrollbar-width: none;
+      /* Firefox */
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -60,10 +68,12 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+
 </head>
-  <body>
-    <div id="root"></div>
+
+<body>
+  <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>
