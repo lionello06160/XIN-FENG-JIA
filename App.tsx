@@ -184,8 +184,9 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
-        <div className="text-2xl font-light tracking-widest animate-pulse">LOADING...</div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-display">
+        <div className="mb-4 text-[#a67c52] text-sm font-bold tracking-[0.4em] uppercase">鑫蘴家</div>
+        <div className="text-xl font-light tracking-[0.2em] animate-pulse text-white/40">LOADING</div>
       </div>
     );
   }
