@@ -1,7 +1,7 @@
 import { ChefProfile, Dish } from './types';
 
 export const INITIAL_CHEF_PROFILE: ChefProfile = {
-  name: "Julian Vane",
+  name: "Rolando",
   title: "Executive Chef / Creative Director",
   bio: "致力於將傳統烹飪技藝與現代創新融合，透過每一道佳餚演繹感官故事。擁有超過十五年的頂級餐飲經驗，專注於食材本味的極致發揮。",
   image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD3jaeKVcJimTXBq17P7X2VU4a4E5zx_Eu3KA6m1jGIIH6GsrOlI2UurzjYT5xLqk6ngEyigdo7sSFr_zAG5SCxNi0sf2mBOtewv4rRNPnHBwXXSlZryB3mj3tZSMl75oE0WY9ZMhjSSjSJdo9itFINrVR80SHQQP0gl86VYob0aNarvOIyvNjKtAx5_EibxzBe3sjkb6MuZei3lzPx8bb-4PbtIZQiYrwh4SkFiNukUY54Zg_DVV0ZWL-ns7St4SKjif2u4mAs4TII",

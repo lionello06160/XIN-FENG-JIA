@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
         manifest: {
           name: '鑫蘴家',
           short_name: '鑫蘴家',
-          description: '鑫蘴家 - Julian Vane Gastronomy 私廚體驗',
+          description: '鑫蘴家 - Rolando Gastronomy 私廚體驗',
           theme_color: '#a67c52',
           background_color: '#181411',
           icons: [

@@ -1,10 +1,10 @@
-# 鑫蘴家 · Julian Vane Gastronomy
+# 鑫蘴家 · Rolando Gastronomy
 
 <div align="center">
-  <img width="1200" alt="Julian Vane Gastronomy Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="1200" alt="Rolando Gastronomy Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-這是一個專為頂級私廚 **Julian Vane** 打造的高級感官饗宴展示網站，整合了現代化的前端設計與強大的後端管理功能。
+這是一個專為頂級私廚 **Rolando** 打造的高級感官饗宴展示網站，整合了現代化的前端設計與強大的後端管理功能。
 
 ## ✨ 核心特色
 
