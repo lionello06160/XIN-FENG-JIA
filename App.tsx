@@ -33,57 +33,74 @@ const App: React.FC = () => {
   };
 
   // Fetch initial data
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch Chef Profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('chef_profile')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      } else if (profileData) {
+        setChefProfile({
+          name: profileData.name,
+          title: profileData.title,
+          bio: profileData.bio,
+          image: profileData.image,
+          socials: {
+            instagram: profileData.instagram || '',
+            facebook: profileData.facebook || '',
+            line: profileData.line || '',
+            email: profileData.email || ''
+          },
+          cta_title: profileData.cta_title || '預約私廚體驗',
+          cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
+          order_link: profileData.order_link || '',
+          show_order_button: !!profileData.show_order_button
+        });
+      }
+
+      // Fetch Dishes
+      const { data: dishesData, error: dishesError } = await supabase
+        .from('dishes')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (dishesError) {
+        console.error('Error fetching dishes:', dishesError);
+      } else if (dishesData) {
+        setDishes(dishesData as Dish[]);
+      }
+    } catch (err) {
+      console.error('Data loading error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // Fetch Chef Profile
-        const { data: profileData, error: profileError } = await supabase
-          .from('chef_profile')
-          .select('*')
-          .eq('id', 1)
-          .single();
+    fetchData();
 
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
-        } else if (profileData) {
-          setChefProfile({
-            name: profileData.name,
-            title: profileData.title,
-            bio: profileData.bio,
-            image: profileData.image,
-            socials: {
-              instagram: profileData.instagram || '',
-              facebook: profileData.facebook || '',
-              line: profileData.line || '',
-              email: profileData.email || ''
-            },
-            cta_title: profileData.cta_title || '預約私廚體驗',
-            cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
-            order_link: profileData.order_link || '',
-            show_order_button: !!profileData.show_order_button
-          });
-        }
-
-        // Fetch Dishes
-        const { data: dishesData, error: dishesError } = await supabase
-          .from('dishes')
-          .select('*')
-          .order('order_index', { ascending: true });
-
-        if (dishesError) {
-          console.error('Error fetching dishes:', dishesError);
-        } else if (dishesData) {
-          setDishes(dishesData as Dish[]);
-        }
-      } catch (err) {
-        console.error('Data loading error:', err);
-      } finally {
-        setLoading(false);
+    // Listen for visibility changes to refresh data when user returns to the app
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('App became visible, refreshing data...');
+        fetchData();
       }
     };
 
-    fetchData();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Also listen for focus event for some browsers/scenarios
+    window.addEventListener('focus', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, []);
 
   // Actions
