@@ -268,7 +268,6 @@ export const EditDish = ({
     <AdminLayout
       title={isNew ? "新增菜色" : "編輯菜色詳情"}
       backTo="/admin"
-      rightAction={<span className="text-admin-primary text-base font-bold cursor-pointer">預覽</span>}
     >
       <div className="px-4 py-4">
         {/* Image Upload */}
