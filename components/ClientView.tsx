@@ -40,7 +40,16 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
           </div>
 
           <div className="mb-6">
-            <h1 className="text-[#181411] text-3xl font-bold leading-tight mb-2 font-display">{dish.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-[#181411] text-3xl font-bold leading-tight font-display">{dish.name}</h1>
+              {dish.spiciness && dish.spiciness > 0 && (
+                <div className="flex gap-0.5 mb-1">
+                  {Array.from({ length: dish.spiciness }).map((_, i) => (
+                    <span key={i} className="text-xl">🌶️</span>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="flex items-baseline gap-2">
               <span className="text-admin-primary text-2xl font-bold">NT$ {dish.price.toLocaleString()}</span>
               {dish.originalPrice && (
