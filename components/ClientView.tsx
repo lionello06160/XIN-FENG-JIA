@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
-import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart } from 'lucide-react';
+import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../lib/supabase';
 
@@ -33,9 +33,17 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 bg-white">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 px-3 py-1 bg-admin-primary/10 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-admin-primary"></div>
-              <span className="text-admin-primary text-xs font-bold tracking-wider uppercase">目前可預訂</span>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1 bg-admin-primary/10 rounded-full">
+                <div className="w-2 h-2 rounded-full bg-admin-primary"></div>
+                <span className="text-admin-primary text-xs font-bold tracking-wider uppercase">目前可預訂</span>
+              </div>
+              {dish.is_new && (
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-gold/10 rounded-full border border-gold/20">
+                  <Sparkles size={12} className="text-gold" />
+                  <span className="text-gold text-xs font-bold tracking-wider uppercase">新品上市</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -153,9 +161,15 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
           {dishes.map((dish) => (
             <div key={dish.id} className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group">
               <div
-                className="bg-cover bg-center aspect-[16/9] transition-transform duration-700 group-hover:scale-105"
+                className="bg-cover bg-center aspect-[16/9] transition-transform duration-700 group-hover:scale-105 relative"
                 style={{ backgroundImage: `url("${dish.image}")` }}
-              ></div>
+              >
+                {dish.is_new && (
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-fade-in">
+                    <span className="text-xs font-bold text-white drop-shadow-md tracking-wider">✨ 新品上市</span>
+                  </div>
+                )}
+              </div>
               <div className="p-4 flex flex-col gap-3 relative bg-luxury-card">
                 <div className="flex justify-between items-start">
                   <div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -350,8 +350,8 @@ export const EditDish = ({
                   key={level}
                   onClick={() => setFormData({ ...formData, spiciness: level })}
                   className={`flex-1 py-3 px-2 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${(formData.spiciness || 0) === level
-                      ? 'border-admin-primary bg-admin-primary/5 text-admin-primary'
-                      : 'border-gray-100 bg-white text-gray-400'
+                    ? 'border-admin-primary bg-admin-primary/5 text-admin-primary'
+                    : 'border-gray-100 bg-white text-gray-400'
                     }`}
                 >
                   <span className="text-sm font-bold">
@@ -371,22 +371,47 @@ export const EditDish = ({
             </div>
           </div>
 
-          <div>
-            <p className="text-[#181411] text-sm font-bold tracking-wider mb-3">供應狀態</p>
-            <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3">
-                <Utensils className="text-admin-primary" size={20} />
-                <span className="text-[#181411] font-medium">顯示為可訂購</span>
+          <div className="space-y-4 pt-4 border-t border-gray-100">
+            <div>
+              <p className="text-[#181411] text-sm font-bold tracking-wider mb-3 px-1">新品上市標記</p>
+              <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gold/10 rounded-lg">
+                    <Sparkles className="text-gold" size={18} />
+                  </div>
+                  <span className="text-[#181411] font-medium">標記為新品</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={formData.is_new || false}
+                    onChange={e => setFormData({ ...formData, is_new: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold"></div>
+                </label>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={formData.available}
-                  onChange={e => setFormData({ ...formData, available: e.target.checked })}
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
-              </label>
+            </div>
+
+            <div>
+              <p className="text-[#181411] text-sm font-bold tracking-wider mb-3 px-1">供應狀態</p>
+              <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-admin-primary/10 rounded-lg">
+                    <Utensils className="text-admin-primary" size={18} />
+                  </div>
+                  <span className="text-[#181411] font-medium">顯示為可訂購</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={formData.available}
+                    onChange={e => setFormData({ ...formData, available: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
+                </label>
+              </div>
             </div>
           </div>
         </div>

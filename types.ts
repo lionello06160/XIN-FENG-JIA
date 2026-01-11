@@ -11,6 +11,7 @@ export interface Dish {
   soldOut?: boolean;
   order_index?: number;
   spiciness?: number;
+  is_new?: boolean;
 }
 
 export interface ChefProfile {
