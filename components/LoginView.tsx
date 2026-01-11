@@ -54,7 +54,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                     <div className="inline-flex items-center justify-center w-20 h-20 bg-[#f27f0d]/10 rounded-full mb-6 border border-[#f27f0d]/20">
                         <span className="material-symbols-outlined text-[#f27f0d] text-5xl">restaurant_menu</span>
                     </div>
-                    <h2 className="text-[#f27f0d] text-sm font-bold tracking-[0.3em] uppercase mb-2">鑫蘴家</h2>
+                    <h2 className="text-[#f27f0d] text-lg font-bold tracking-[0.3em] uppercase mb-2">鑫蘴家</h2>
                     <h1 className="text-white tracking-tight text-3xl font-bold leading-tight px-4 text-center">
                         主廚管理系統
                     </h1>
