@@ -34,10 +34,17 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
         <div className="flex-1 overflow-y-auto px-6 py-6 bg-white">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1 bg-admin-primary/10 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-admin-primary"></div>
-                <span className="text-admin-primary text-xs font-bold tracking-wider uppercase">目前可預訂</span>
-              </div>
+              {dish.available ? (
+                <div className="flex items-center gap-2 px-3 py-1 bg-admin-primary/10 rounded-full">
+                  <div className="w-2 h-2 rounded-full bg-admin-primary"></div>
+                  <span className="text-admin-primary text-xs font-bold tracking-wider uppercase">目前可預訂</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-1 bg-red-500/10 rounded-full border border-red-500/20">
+                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                  <span className="text-red-500 text-xs font-bold tracking-wider uppercase">售罄</span>
+                </div>
+              )}
               {dish.is_new && (
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-gold/10 rounded-full border border-gold/20">
                   <Sparkles size={12} className="text-gold" />
