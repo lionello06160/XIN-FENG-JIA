@@ -81,9 +81,7 @@ export const AdminDashboard = ({
           <p className="text-[#8a7560] text-xs font-medium uppercase tracking-wider">主廚管理控制台</p>
         </div>
         <div className="flex w-12 items-center justify-end">
-          <button className="flex cursor-pointer items-center justify-center rounded-lg h-10 w-10 bg-transparent text-[#181411] hover:bg-gray-100">
-            <Search size={24} />
-          </button>
+          {/* Search removed */}
         </div>
       </header>
 
