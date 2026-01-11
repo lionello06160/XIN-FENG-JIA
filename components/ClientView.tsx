@@ -42,7 +42,7 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
           <div className="mb-6">
             <div className="flex items-center gap-2">
               <h1 className="text-[#181411] text-3xl font-bold leading-tight font-display">{dish.name}</h1>
-              {dish.spiciness && dish.spiciness > 0 && (
+              {!!dish.spiciness && dish.spiciness > 0 && (
                 <div className="flex gap-0.5 mb-1">
                   {Array.from({ length: dish.spiciness }).map((_, i) => (
                     <span key={i} className="text-xl">🌶️</span>
@@ -162,7 +162,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
                     <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">名稱</span>
                     <div className="flex items-center gap-2">
                       <p className="text-white text-lg font-bold leading-tight">{dish.name}</p>
-                      {dish.spiciness && dish.spiciness > 0 && (
+                      {!!dish.spiciness && dish.spiciness > 0 && (
                         <div className="flex gap-0.5">
                           {Array.from({ length: dish.spiciness }).map((_, i) => (
                             <span key={i} className="text-sm">🌶️</span>
