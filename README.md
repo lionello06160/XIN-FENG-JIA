@@ -42,9 +42,15 @@
    npm run dev
    ```
 
-### 資料庫初始化
+### 🗄️ 資料庫初始化 (Supabase)
 
-請在 Supabase SQL Editor 中執行專案內的 `setup.sql` 腳本，以自動創建必要的資料表與預設管理員帳號 (`rolando`)。
+為了讓後端功能正常運作，請在您的 Supabase 專案中執行以下腳本：
+
+1. **全新安裝**：在 **SQL Editor** 中複製並執行 [`setup.sql`](./setup.sql)。
+2. **舊版升級**：如果您是從舊版本升級，可以執行 [`migrate_profile.sql`](./migrate_profile.sql) 來補齊新增的欄位。
+3. **圖片空間**：請在 Storage 中手動建立一個名為 `images` 的 **Public** 儲存桶。
+
+預設管理員帳號：`rolando` / 密碼：`rolando`。
 
 ---
 
