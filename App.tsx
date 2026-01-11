@@ -130,22 +130,24 @@ const App: React.FC = () => {
   };
 
   const handleReorderDishes = async (newDishes: Dish[]) => {
-    // Optimistic update
-    setDishes(newDishes);
-
-    // Update indexes in DB
-    const updates = newDishes.map((dish, index) => ({
-      id: dish.id,
+    // 1. 同步 index 到物件中
+    const reorderedWithIndex = newDishes.map((dish, index) => ({
+      ...dish,
       order_index: index
     }));
 
+    // Optimistic update
+    setDishes(reorderedWithIndex);
+
+    // 2. 更新資料庫
     const { error } = await supabase
       .from('dishes')
-      .upsert(updates);
+      .upsert(reorderedWithIndex);
 
     if (error) {
       console.error('Error reordering dishes:', error);
-      // Fallback or alert user
+      alert('排序儲存失敗：' + error.message);
+      // 可選擇在此處恢復舊的排序狀態，但我們先讓用戶看到錯誤
     }
   };
 

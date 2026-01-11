@@ -9,6 +9,7 @@ export interface Dish {
   image: string;
   available: boolean;
   soldOut?: boolean;
+  order_index?: number;
 }
 
 export interface ChefProfile {
