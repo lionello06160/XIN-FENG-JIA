@@ -12,10 +12,11 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
     if (!items || items.length === 0) return null;
 
     return (
-        <div className="w-full bg-[#f9f9f9] py-8 px-4">
+        <div className="w-full bg-luxury-dark py-12 px-4 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.5)]">
             <div className="max-w-md mx-auto">
-                <div className="bg-white border border-gray-200 py-3 mb-8 text-center">
-                    <h2 className="text-[#181411] text-xl font-bold tracking-[0.2em] uppercase">Q & A</h2>
+                <div className="flex items-center justify-between pt-4 pb-8">
+                    <h3 className="text-white text-2xl font-bold tracking-tight">Q & A</h3>
+                    <div className="h-[1px] flex-1 bg-gold/30 ml-4 rounded-full"></div>
                 </div>
 
                 <div className="space-y-4">
@@ -24,31 +25,33 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
                         return (
                             <div
                                 key={item.id}
-                                className="bg-white border-b border-gray-100 last:border-0 overflow-hidden transition-all duration-300"
+                                className="bg-luxury-card rounded-2xl border border-white/5 overflow-hidden transition-all duration-300 shadow-lg"
                             >
                                 <button
                                     onClick={() => setOpenId(isOpen ? null : item.id)}
-                                    className="w-full flex items-center justify-between py-5 text-left focus:outline-none group"
+                                    className="w-full flex items-center justify-between p-5 text-left focus:outline-none group"
                                 >
                                     <div className="flex items-start gap-2 pr-4">
-                                        <span className="text-admin-primary font-bold whitespace-nowrap">Q{index + 1}:</span>
-                                        <span className="text-[#181411] font-medium leading-relaxed">{item.question}</span>
+                                        <span className="text-gold font-bold whitespace-nowrap">Q{index + 1}:</span>
+                                        <span className="text-white font-medium leading-relaxed">{item.question}</span>
                                     </div>
-                                    <div className={`shrink-0 w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center transition-colors group-hover:border-admin-primary ${isOpen ? 'bg-admin-primary border-admin-primary' : 'bg-white'}`}>
+                                    <div className={`shrink-0 w-8 h-8 rounded-full border border-gold/20 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-gold border-gold scale-110' : 'bg-gold/5 group-hover:bg-gold/20'}`}>
                                         {isOpen ? (
-                                            <Minus size={14} className="text-white" />
+                                            <Minus size={16} className="text-black" />
                                         ) : (
-                                            <Plus size={14} className="text-gray-400 group-hover:text-admin-primary" />
+                                            <Plus size={16} className="text-gold" />
                                         )}
                                     </div>
                                 </button>
 
                                 <div
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 pb-6' : 'max-h-0'}`}
+                                    className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
-                                    <p className="text-gray-500 text-sm leading-relaxed pl-8">
-                                        {item.answer}
-                                    </p>
+                                    <div className="p-5 pt-0 border-t border-white/5 mt-1">
+                                        <p className="text-gray-300 text-sm leading-relaxed pl-7">
+                                            {item.answer}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         );
