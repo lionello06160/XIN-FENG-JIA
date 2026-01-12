@@ -48,8 +48,8 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
                                 <div
                                     className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
-                                    <div className="p-5 pt-0 border-t border-white/5 mt-1">
-                                        <p className="text-gray-300 text-sm leading-relaxed pl-7">
+                                    <div className="p-5 mt-1 flex items-center justify-center">
+                                        <p className="text-gray-300 text-sm leading-relaxed text-center">
                                             {item.answer}
                                         </p>
                                     </div>
