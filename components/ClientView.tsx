@@ -17,7 +17,7 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-white dark:bg-[#2d241a] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-xl bg-white dark:bg-[#2d241a] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300">
 
         {/* Close Button */}
         <div className="absolute top-4 right-4 z-30">
@@ -125,14 +125,14 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
     <div className="min-h-screen bg-luxury-dark text-white font-sans selection:bg-gold selection:text-black">
       {/* Sticky Navigation */}
       <nav className="sticky top-0 z-40 bg-luxury-dark/90 backdrop-blur-md border-b border-gold/20">
-        <div className="flex items-center p-4 justify-between max-w-md mx-auto">
-          <div className="text-gold flex w-10 shrink-0 items-center justify-center">
+        <div className="flex items-center p-4 justify-between max-w-6xl mx-auto">
+          <div className="text-gold flex w-10 md:w-32 shrink-0 items-center justify-center md:justify-start">
             <Utensils size={24} />
           </div>
-          <h1 className="text-white text-lg font-bold leading-tight tracking-widest flex-1 text-center uppercase">
+          <h1 className="text-gold text-lg md:text-xl font-bold leading-tight tracking-widest flex-1 text-center uppercase">
             鑫蘴家
           </h1>
-          <div className="flex w-10 items-center justify-end">
+          <div className="flex w-10 md:w-32 items-center justify-end">
             <Link to="/admin" className="text-gold hover:text-white transition-colors">
               <User size={24} />
             </Link>
@@ -140,19 +140,19 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
       </nav>
 
-      <main className="max-w-md mx-auto pb-12">
+      <main className="max-w-6xl mx-auto pb-12 px-4 md:px-8">
 
         {/* Hero Section */}
-        <div className="p-4">
+        <div className="py-6 md:py-10">
           <div
-            className="bg-cover bg-center flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] shadow-2xl relative border border-gold/10"
+            className="bg-cover bg-[center_20%] flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] md:min-h-[500px] shadow-2xl relative border border-gold/10"
             style={{
               backgroundImage: `linear-gradient(0deg, rgba(18, 18, 18, 1) 0%, rgba(18, 18, 18, 0.4) 40%, rgba(0, 0, 0, 0) 70%), url("${chefProfile.image}")`
             }}
           >
-            <div className="flex flex-col p-6 gap-3">
-              <h2 className="text-white text-4xl font-black leading-tight">{chefProfile.name}</h2>
-              <p className="text-gray-300 text-sm font-light leading-relaxed">
+            <div className="flex flex-col p-6 md:p-12 gap-3 md:max-w-2xl">
+              <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md">{chefProfile.name}</h2>
+              <p className="text-gray-300 text-sm md:text-base font-light leading-relaxed max-w-md">
                 {chefProfile.bio}
               </p>
             </div>
@@ -166,7 +166,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
 
         {/* Menu Grid */}
-        <div className="grid grid-cols-1 gap-6 p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 py-4">
           {dishes.map((dish) => (
             <div key={dish.id} className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group">
               <div

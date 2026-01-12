@@ -13,7 +13,7 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
 
     return (
         <div className="w-full px-4 pb-12">
-            <div className="max-w-md mx-auto">
+            <div className="max-w-4xl mx-auto">
                 <div className="flex items-center justify-center gap-4 pt-0 pb-8">
                     <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
                     <h3 className="text-white text-2xl font-bold tracking-tight whitespace-nowrap">Q & A</h3>
