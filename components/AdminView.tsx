@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical
+  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical
 } from 'lucide-react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -31,6 +31,57 @@ import { CSS } from '@dnd-kit/utilities';
 
 // --- Shared Components ---
 
+const AdminBottomNav = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { label: '菜色管理', icon: Utensils, path: '/admin' },
+    { label: '數據分析', icon: BarChart3, path: '/admin/analytics' },
+    { label: '個人資料', icon: User, path: '/admin/profile' },
+    { label: 'Q&A 管理', icon: HelpCircle, path: '/admin/qa' },
+    { label: '帳號安全', icon: Lock, path: '/admin/security' },
+  ];
+
+  const handleLogout = () => {
+    if (window.confirm('確定要退出登入嗎？')) {
+      localStorage.removeItem('chef_session');
+      window.location.href = '/admin'; // Force reload to trigger auth check
+    }
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-md border-t border-gray-100 px-2 pb-safe-area-inset-bottom">
+      <div className="max-w-6xl mx-auto flex items-center justify-between h-20">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path || (item.path === '/admin' && (location.pathname === '/admin' || location.pathname.startsWith('/admin/dish')));
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={`flex flex-col items-center justify-center flex-1 gap-1.5 transition-colors ${isActive ? 'text-admin-primary' : 'text-[#8a7560]'
+                }`}
+            >
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+              <span className={`text-[10px] font-bold ${isActive ? 'text-admin-primary' : 'text-[#8a7560]'}`}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center justify-center flex-1 gap-1.5 text-[#8a7560] hover:text-red-500 transition-colors"
+        >
+          <Settings size={20} />
+          <span className="text-[10px] font-bold">退出</span>
+        </button>
+      </div>
+    </nav>
+  );
+};
+
 const AdminLayout = ({ children, title, backTo, rightAction }: { children?: React.ReactNode, title: string, backTo?: string, rightAction?: React.ReactNode }) => {
   const navigate = useNavigate();
   return (
@@ -53,9 +104,10 @@ const AdminLayout = ({ children, title, backTo, rightAction }: { children?: Reac
           {rightAction || <div className="w-12"></div>}
         </div>
       </header>
-      <main className="flex-1 w-full max-w-6xl mx-auto overflow-y-auto pb-24 px-4 md:px-8">
+      <main className="flex-1 w-full max-w-6xl mx-auto overflow-y-auto pb-32 px-4 md:px-8">
         {children}
       </main>
+      <AdminBottomNav />
     </div>
   );
 };
@@ -1151,41 +1203,6 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
             {dishStats.length === 0 && (
               <div className="text-center py-8 text-gray-400 text-sm italic">暫無點擊數據</div>
             )}
-          </div>
-        </div>
-
-        {/* Quick Links Footer */}
-        <div className="col-span-full mt-8 border-t border-gray-100 pt-8 pb-12">
-          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">快速管理選單</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <button
-              onClick={() => navigate('/admin')}
-              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
-            >
-              <Utensils size={20} />
-              <span className="text-xs font-bold">菜單管理</span>
-            </button>
-            <button
-              onClick={() => navigate('/admin/qa')}
-              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
-            >
-              <HelpCircle size={20} />
-              <span className="text-xs font-bold">Q&A 管理</span>
-            </button>
-            <button
-              onClick={() => navigate('/admin/profile')}
-              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
-            >
-              <UserCog size={20} />
-              <span className="text-xs font-bold">個人資料</span>
-            </button>
-            <button
-              onClick={() => navigate('/admin/security')}
-              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
-            >
-              <Lock size={20} />
-              <span className="text-xs font-bold">帳號安全</span>
-            </button>
           </div>
         </div>
       </main>
