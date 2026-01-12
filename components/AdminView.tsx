@@ -1088,14 +1088,7 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
   }
 
   return (
-    <div className="min-h-screen bg-admin-bg font-display text-[#181411]">
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md p-4 flex items-center gap-3 border-b border-gray-100">
-        <button onClick={() => navigate('/admin')} className="p-2 hover:bg-gray-100 rounded-lg">
-          <ArrowLeft size={24} />
-        </button>
-        <h2 className="text-lg font-bold">數據分析報表</h2>
-      </header>
-
+    <AdminLayout title="數據分析報表" backTo="/admin">
       <main className="max-w-6xl mx-auto p-4 md:p-8 flex flex-col lg:grid lg:grid-cols-2 gap-6 pb-24">
         {/* Time Range Selector */}
         <div className="col-span-full">
@@ -1134,38 +1127,69 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
           </div>
         </div>
 
-        {/* Dish Clicks Ranking */}
+        {/* Dish Ranking */}
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">各產品點擊分析</h3>
-          <div className="flex flex-col gap-3">
-            {dishStats.length === 0 ? (
-              <p className="text-center text-gray-400 text-sm py-8">目前尚無點擊數據</p>
-            ) : (
-              dishStats.map((stat, idx) => (
-                <div key={idx} className="flex items-center justify-between group">
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className={`size-6 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 ${idx === 0 ? 'bg-admin-primary text-white' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      {idx + 1}
-                    </div>
-                    <span className="text-sm font-medium truncate">{stat.name}</span>
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">熱門菜色排名</h3>
+          <div className="flex flex-col gap-4">
+            {dishStats.slice(0, 5).map((stat, idx) => (
+              <div key={stat.name} className="flex items-center gap-4">
+                <span className={`text-sm font-black w-6 ${idx < 3 ? 'text-admin-primary' : 'text-gray-300'}`}>{String(idx + 1).padStart(2, '0')}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-bold truncate">{stat.name}</span>
+                    <span className="text-sm font-bold">{stat.count} 次點擊</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-1.5 bg-gray-100 rounded-full w-24 overflow-hidden hidden sm:block">
-                      <div
-                        className="h-full bg-admin-primary rounded-full transition-all duration-1000"
-                        style={{ width: `${(stat.count / dishStats[0].count) * 100}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-bold tabular-nums min-w-[32px] text-right">{stat.count}次</span>
+                  <div className="w-full bg-gray-50 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-admin-primary h-full rounded-full transition-all duration-1000"
+                      style={{ width: `${(stat.count / (dishStats[0]?.count || 1)) * 100}%` }}
+                    ></div>
                   </div>
                 </div>
-              ))
+              </div>
+            ))}
+            {dishStats.length === 0 && (
+              <div className="text-center py-8 text-gray-400 text-sm italic">暫無點擊數據</div>
             )}
           </div>
         </div>
+
+        {/* Quick Links Footer */}
+        <div className="col-span-full mt-8 border-t border-gray-100 pt-8 pb-12">
+          <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">快速管理選單</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button
+              onClick={() => navigate('/admin')}
+              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
+            >
+              <Utensils size={20} />
+              <span className="text-xs font-bold">菜單管理</span>
+            </button>
+            <button
+              onClick={() => navigate('/admin/qa')}
+              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
+            >
+              <HelpCircle size={20} />
+              <span className="text-xs font-bold">Q&A 管理</span>
+            </button>
+            <button
+              onClick={() => navigate('/admin/profile')}
+              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
+            >
+              <UserCog size={20} />
+              <span className="text-xs font-bold">個人資料</span>
+            </button>
+            <button
+              onClick={() => navigate('/admin/security')}
+              className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-admin-primary/20 transition-all text-gray-600 hover:text-admin-primary"
+            >
+              <Lock size={20} />
+              <span className="text-xs font-bold">帳號安全</span>
+            </button>
+          </div>
+        </div>
       </main>
-    </div>
+    </AdminLayout>
   );
 };
 
