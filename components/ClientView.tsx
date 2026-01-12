@@ -212,7 +212,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
 
         {/* CTA Section */}
-        <div className="px-4 pt-8 pb-2">
+        <div className="px-4 py-8">
           <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
             <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
             <p className="text-sm text-white/70">{chefProfile.cta_description}</p>

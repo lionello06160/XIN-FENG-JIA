@@ -12,7 +12,7 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
     if (!items || items.length === 0) return null;
 
     return (
-        <div className="w-full bg-luxury-dark pt-0 pb-12 px-4 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.5)]">
+        <div className="w-full px-4 pb-12">
             <div className="max-w-md mx-auto">
                 <div className="flex items-center justify-center gap-4 pt-0 pb-8">
                     <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
