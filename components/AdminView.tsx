@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -187,6 +187,10 @@ export const AdminDashboard = ({
         <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/admin/qa')}>
           <HelpCircle size={24} />
           <span className="text-[10px] font-medium">Q&A 管理</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/admin/security')}>
+          <Lock size={24} />
+          <span className="text-[10px] font-medium">帳號安全</span>
         </button>
         <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/')}>
           <Settings size={24} />
@@ -672,7 +676,199 @@ export const EditProfile = ({
   );
 };
 
-// --- Analytics Dashboard Component ---
+// --- Change Password ---
+
+export const ChangePassword = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleSubmit = async () => {
+    setError('');
+    setSuccess('');
+
+    if (!username || !oldPassword || !newPassword || !confirmPassword) {
+      setError('請填寫所有欄位');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError('新密碼與確認密碼不符');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError('新密碼長度至少需 6 個字元');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // 1. Verify old password
+      const { data: user, error: authError } = await supabase
+        .from('admin_auth')
+        .select('*')
+        .eq('username', username)
+        .eq('password', oldPassword)
+        .single();
+
+      if (authError || !user) {
+        setError('帳號或舊密碼錯誤');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Update password
+      const { error: updateError } = await supabase
+        .from('admin_auth')
+        .update({ password: newPassword })
+        .eq('username', username);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setSuccess('密碼修改成功！下次登入請使用新密碼。');
+      setUsername('');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+      // Optional: Redirect after delay
+      setTimeout(() => {
+        navigate('/admin');
+      }, 2000);
+
+    } catch (err) {
+      console.error('Password change error:', err);
+      setError('修改失敗，請稍後再試');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AdminLayout title="帳號安全設定" backTo="/admin">
+      <div className="p-6">
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center mb-6">
+          <div className="w-16 h-16 bg-admin-primary/10 rounded-full flex items-center justify-center mb-4 text-admin-primary">
+            <ShieldCheck size={32} />
+          </div>
+          <h3 className="text-[#181411] text-lg font-bold mb-2">變更管理員密碼</h3>
+          <p className="text-gray-500 text-xs">為了您的帳號安全，建議定期更換密碼。請輸入您的帳號及舊密碼以進行驗證。</p>
+        </div>
+
+        {success ? (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center flex flex-col items-center gap-3 animate-fade-in">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+              <CheckCircle2 size={24} />
+            </div>
+            <h4 className="text-green-800 font-bold">修改成功</h4>
+            <p className="text-green-700 text-sm">{success}</p>
+            <button
+              onClick={() => navigate('/admin')}
+              className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-bold shadow-sm active:scale-95 transition-transform"
+            >
+              返回首頁
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <label className="flex flex-col w-full gap-1">
+              <p className="text-[#181411] text-sm font-medium px-1">管理員帳號</p>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <User size={18} />
+                </div>
+                <input
+                  className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-12 pl-11 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                  placeholder="請輸入帳號"
+                />
+              </div>
+            </label>
+
+            <label className="flex flex-col w-full gap-1">
+              <p className="text-[#181411] text-sm font-medium px-1">目前舊密碼</p>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <KeyRound size={18} />
+                </div>
+                <input
+                  type="password"
+                  className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-12 pl-11 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                  value={oldPassword}
+                  onChange={e => setOldPassword(e.target.value)}
+                  placeholder="驗證身分用"
+                />
+              </div>
+            </label>
+
+            <div className="h-px bg-gray-100 my-2"></div>
+
+            <label className="flex flex-col w-full gap-1">
+              <p className="text-[#181411] text-sm font-medium px-1">新密碼</p>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Lock size={18} />
+                </div>
+                <input
+                  type="password"
+                  className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-12 pl-11 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="請設定新密碼"
+                />
+              </div>
+            </label>
+
+            <label className="flex flex-col w-full gap-1">
+              <p className="text-[#181411] text-sm font-medium px-1">確認新密碼</p>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Lock size={18} />
+                </div>
+                <input
+                  type="password"
+                  className="flex w-full rounded-lg border border-[#e6e0db] bg-white h-12 pl-11 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  placeholder="再次輸入新密碼"
+                />
+              </div>
+            </label>
+
+            {error && (
+              <div className="p-3 bg-red-50 text-red-500 text-sm rounded-lg text-center font-bold animate-pulse">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {!success && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-white/80 backdrop-blur-md border-t border-gray-100">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-admin-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+            {loading ? '處理中...' : '確認修改密碼'}
+          </button>
+        </div>
+      )}
+    </AdminLayout>
+  );
+};
 
 export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
   const navigate = useNavigate();
