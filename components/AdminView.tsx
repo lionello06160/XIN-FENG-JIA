@@ -822,7 +822,7 @@ export const EditProfile = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-6xl mx-auto p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 z-50">
+      <div className="mt-8 border-t border-gray-100 pt-8">
         <button
           onClick={handleSave}
           disabled={isSubmitting}
@@ -1015,7 +1015,7 @@ export const ChangePassword = () => {
       </div>
 
       {!success && (
-        <div className="fixed bottom-0 left-0 right-0 max-w-6xl mx-auto p-4 bg-white/80 backdrop-blur-md border-t border-gray-100">
+        <div className="mt-8">
           <button
             onClick={handleSubmit}
             disabled={loading}
