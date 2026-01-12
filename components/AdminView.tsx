@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical
+  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical, Home
 } from 'lucide-react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -43,11 +43,8 @@ const AdminBottomNav = () => {
     { label: '帳號安全', icon: Lock, path: '/admin/security' },
   ];
 
-  const handleLogout = () => {
-    if (window.confirm('確定要退出登入嗎？')) {
-      localStorage.removeItem('chef_session');
-      window.location.href = '/admin'; // Force reload to trigger auth check
-    }
+  const handleHome = () => {
+    navigate('/');
   };
 
   return (
@@ -71,11 +68,11 @@ const AdminBottomNav = () => {
           );
         })}
         <button
-          onClick={handleLogout}
-          className="flex flex-col items-center justify-center flex-1 gap-1.5 text-[#8a7560] hover:text-red-500 transition-colors"
+          onClick={handleHome}
+          className="flex flex-col items-center justify-center flex-1 gap-1.5 text-[#8a7560] hover:text-admin-primary transition-colors"
         >
-          <Settings size={20} />
-          <span className="text-[10px] font-bold">退出</span>
+          <Home size={20} />
+          <span className="text-[10px] font-bold">首頁</span>
         </button>
       </div>
     </nav>
@@ -434,7 +431,7 @@ export const EditDish = ({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-40">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-48">
           <div className="space-y-6">
             <label className="flex flex-col w-full gap-2">
               <p className="text-[#181411] text-sm font-bold tracking-wider">菜色名稱</p>
@@ -556,7 +553,7 @@ export const EditDish = ({
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-6xl mx-auto p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 z-50">
+      <div className="mt-12 border-t border-gray-100 pt-8 pb-12">
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
