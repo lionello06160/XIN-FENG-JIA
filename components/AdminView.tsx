@@ -170,7 +170,7 @@ export const AdminDashboard = ({
       <main className="flex-1 w-full max-w-6xl mx-auto pb-24 px-4 md:px-8">
         {/* Actions */}
         <div className="py-6">
-          <Link to="/admin/dish/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full md:max-w-xs">
+          <Link to="/admin/dish/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
             <PlusCircle size={24} />
             <span className="font-bold tracking-wide">新增菜色</span>
           </Link>
