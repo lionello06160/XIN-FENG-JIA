@@ -82,13 +82,15 @@ const AdminBottomNav = () => {
   );
 };
 
-const AdminLayout = ({ children, title, backTo, rightAction }: { children?: React.ReactNode, title: string, backTo?: string, rightAction?: React.ReactNode }) => {
+const AdminLayout = ({ children, title, backTo, leftAction, rightAction }: { children?: React.ReactNode, title: string, backTo?: string, leftAction?: React.ReactNode, rightAction?: React.ReactNode }) => {
   const navigate = useNavigate();
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-admin-bg font-display text-[#181411]">
       <header className="sticky top-0 z-50 flex items-center bg-white/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100">
         <div className="flex size-12 shrink-0 items-center">
-          {backTo ? (
+          {leftAction ? (
+            leftAction
+          ) : backTo ? (
             <button onClick={() => navigate(backTo)} className="text-[#181411] flex size-12 shrink-0 items-center justify-center hover:bg-gray-50 rounded-full">
               <ChevronLeft />
             </button>
@@ -97,9 +99,14 @@ const AdminLayout = ({ children, title, backTo, rightAction }: { children?: Reac
             <div className="w-12"></div>
           )}
         </div>
-        <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center truncate px-2">
-          {title}
-        </h2>
+        <div className="flex flex-col flex-1 px-2 items-center text-center">
+          <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] truncate w-full">
+            {title}
+          </h2>
+          {title === "鑫蘴家 · 管理後台" && (
+            <p className="text-[#8a7560] text-xs font-medium uppercase tracking-wider">主廚管理控制台</p>
+          )}
+        </div>
         <div className="flex w-12 items-center justify-center">
           {rightAction || <div className="w-12"></div>}
         </div>
@@ -204,162 +211,121 @@ export const AdminDashboard = ({
   };
 
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-admin-bg font-display text-[#181411]">
-      {/* Dashboard Header */}
-      <header className="sticky top-0 z-50 flex items-center bg-white/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100">
-        <div className="flex size-12 shrink-0 items-center">
-          <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-admin-primary" style={{ backgroundImage: `url("${chefProfile.image}")` }}></div>
-        </div>
-        <div className="flex flex-col flex-1 px-2">
-          <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">鑫蘴家 · 管理後台</h2>
-          <p className="text-[#8a7560] text-xs font-medium uppercase tracking-wider">主廚管理控制台</p>
-        </div>
-        <div className="flex w-12 items-center justify-end">
-          {/* Search removed */}
-        </div>
-      </header>
+    <AdminLayout
+      title="鑫蘴家 · 管理後台"
+      leftAction={
+        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-admin-primary" style={{ backgroundImage: `url("${chefProfile.image}")` }}></div>
+      }
+    >
+      {/* Actions */}
+      <div className="py-6">
+        <Link to="/admin/dish/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
+          <PlusCircle size={24} />
+          <span className="font-bold tracking-wide">新增菜色</span>
+        </Link>
+      </div>
 
-      <main className="flex-1 w-full max-w-6xl mx-auto pb-24 px-4 md:px-8">
-        {/* Actions */}
-        <div className="py-6">
-          <Link to="/admin/dish/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
-            <PlusCircle size={24} />
-            <span className="font-bold tracking-wide">新增菜色</span>
-          </Link>
-        </div>
+      {/* List Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <h3 className="text-[#181411] text-xl font-bold leading-tight tracking-tight">菜單列表</h3>
+        <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{dishes.length} / 20 項目</span>
+      </div>
 
-        {/* List Header */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <h3 className="text-[#181411] text-xl font-bold leading-tight tracking-tight">菜單列表</h3>
-          <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{dishes.length} / 20 項目</span>
-        </div>
-
-        {/* List */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+      {/* List */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={dishes.map(d => d.id)}
+          strategy={rectSortingStrategy}
         >
-          <SortableContext
-            items={dishes.map(d => d.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
-              {dishes.map((dish, index) => (
-                <SortableItem key={dish.id} id={dish.id}>
-                  <div className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md h-full">
-                    <div className="flex items-center gap-3 justify-between mb-4">
-                      <div className="flex items-center gap-3 overflow-hidden flex-1 pl-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+            {dishes.map((dish, index) => (
+              <SortableItem key={dish.id} id={dish.id}>
+                <div className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md h-full">
+                  <div className="flex items-center gap-3 justify-between mb-4">
+                    <div className="flex items-center gap-3 overflow-hidden flex-1 pl-4">
 
-                        {/* Sort Controls (Fallback) */}
-                        <div className="flex flex-col gap-1 shrink-0">
-                          <button
-                            disabled={index === 0}
-                            onClick={() => moveDish(index, 'up')}
-                            className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                            title="上移"
-                          >
-                            <ChevronUp size={14} />
-                          </button>
-                          <button
-                            disabled={index === dishes.length - 1}
-                            onClick={() => moveDish(index, 'down')}
-                            className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                            title="下移"
-                          >
-                            <ChevronDown size={14} />
-                          </button>
+                      {/* Sort Controls (Fallback) */}
+                      <div className="flex flex-col gap-1 shrink-0">
+                        <button
+                          disabled={index === 0}
+                          onClick={() => moveDish(index, 'up')}
+                          className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                          title="上移"
+                        >
+                          <ChevronUp size={14} />
+                        </button>
+                        <button
+                          disabled={index === dishes.length - 1}
+                          onClick={() => moveDish(index, 'down')}
+                          className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                          title="下移"
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                      </div>
+
+                      <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-14 shrink-0 bg-gray-200 border border-gray-50" style={{ backgroundImage: `url("${dish.image}")` }}></div>
+                      <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 overflow-hidden">
+                          <p className="text-[#181411] text-base font-bold leading-tight truncate">{dish.name}</p>
+                          {!!dish.spiciness && dish.spiciness > 0 && (
+                            <div className="flex shrink-0">
+                              {Array.from({ length: dish.spiciness }).map((_, i) => (
+                                <span key={i} className="text-[10px]">🌶️</span>
+                              ))}
+                            </div>
+                          )}
                         </div>
-
-                        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-14 shrink-0 bg-gray-200 border border-gray-50" style={{ backgroundImage: `url("${dish.image}")` }}></div>
-                        <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5 overflow-hidden">
-                            <p className="text-[#181411] text-base font-bold leading-tight truncate">{dish.name}</p>
-                            {!!dish.spiciness && dish.spiciness > 0 && (
-                              <div className="flex shrink-0">
-                                {Array.from({ length: dish.spiciness }).map((_, i) => (
-                                  <span key={i} className="text-[10px]">🌶️</span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <div className={`size-1.5 rounded-full ${dish.available ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                            <span className={`text-[10px] font-bold ${dish.available ? 'text-green-600' : 'text-red-500'}`}>
-                              {dish.available ? '供應中' : '已售罄'}
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <div className={`size-1.5 rounded-full ${dish.available ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                          <span className={`text-[10px] font-bold ${dish.available ? 'text-green-600' : 'text-red-500'}`}>
+                            {dish.available ? '供應中' : '已售罄'}
+                          </span>
+                          {dish.is_new && (
+                            <span className="bg-gold text-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-gold shadow-sm ml-0.5">
+                              NEW
                             </span>
-                            {dish.is_new && (
-                              <span className="bg-gold text-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-gold shadow-sm ml-0.5">
-                                NEW
-                              </span>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
-                      <button
-                        onClick={() => navigate(`/admin/dish/${dish.id}`)}
-                        className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
-                      >
-                        <Edit size={16} />
-                        <span>編輯</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (window.confirm('確定要刪除這道菜色嗎？')) onDeleteDish(dish.id);
-                        }}
-                        className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
-                      >
-                        <Trash size={16} />
-                        <span>刪除</span>
-                      </button>
-                    </div>
                   </div>
-                </SortableItem>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
 
-        {/* Info Box */}
-        <div className="mx-4 mt-4 px-4 py-3 bg-admin-primary/10 text-admin-primary flex items-center gap-3 rounded-lg">
-          <Info size={20} />
-          <p className="text-xs font-medium">您可以繼續新增菜色，直到達到上限。</p>
-        </div>
-      </main>
+                  <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
+                    <button
+                      onClick={() => navigate(`/admin/dish/${dish.id}`)}
+                      className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
+                    >
+                      <Edit size={16} />
+                      <span>編輯</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('確定要刪除這道菜色嗎？')) onDeleteDish(dish.id);
+                      }}
+                      className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
+                    >
+                      <Trash size={16} />
+                      <span>刪除</span>
+                    </button>
+                  </div>
+                </div>
+              </SortableItem>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 w-full left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 h-16 pb-2 z-[100]">
-        <div className="max-w-6xl mx-auto flex justify-around items-center h-full">
-          <button className="flex flex-col items-center gap-1 text-admin-primary min-w-[64px]">
-            <Utensils size={24} fill="currentColor" />
-            <span className="text-[10px] font-bold">菜色管理</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-[#8a7560] min-w-[64px]" onClick={() => navigate('/admin/analytics')}>
-            <BarChart size={24} />
-            <span className="text-[10px] font-medium">數據分析</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-[#8a7560] min-w-[64px]" onClick={() => navigate('/admin/profile')}>
-            <User size={24} />
-            <span className="text-[10px] font-medium">個人資料</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-[#8a7560] min-w-[64px]" onClick={() => navigate('/admin/qa')}>
-            <HelpCircle size={24} />
-            <span className="text-[10px] font-medium">Q&A 管理</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-[#8a7560] min-w-[64px]" onClick={() => navigate('/admin/security')}>
-            <Lock size={24} />
-            <span className="text-[10px] font-medium">帳號安全</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-[#8a7560] min-w-[64px]" onClick={() => navigate('/')}>
-            <Settings size={24} />
-            <span className="text-[10px] font-medium">退出</span>
-          </button>
-        </div>
-      </nav>
-    </div>
+      {/* Info Box */}
+      <div className="mx-4 mt-4 px-4 py-3 bg-admin-primary/10 text-admin-primary flex items-center gap-3 rounded-lg">
+        <Info size={20} />
+        <p className="text-xs font-medium">您可以繼續新增菜色，直到達到上限。</p>
+      </div>
+    </AdminLayout>
   );
 };
 
