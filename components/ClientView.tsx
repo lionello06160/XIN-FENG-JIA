@@ -160,10 +160,10 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
 
         {/* Menu Section Header */}
-        <div className="flex items-center justify-center gap-4 px-4 pt-8 pb-4">
-          <div className="h-[1px] w-8 md:w-16 bg-gold/30 rounded-full"></div>
-          <h3 className="text-white text-2xl font-bold tracking-[0.1em] text-center">主廚精選</h3>
-          <div className="h-[1px] w-8 md:w-16 bg-gold/30 rounded-full"></div>
+        <div className="flex items-center justify-center gap-6 px-4 pt-8 pb-4">
+          <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
+          <h3 className="text-white text-2xl font-bold tracking-[0.2em] text-center whitespace-nowrap uppercase">主廚精選</h3>
+          <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
         </div>
 
         {/* Menu Grid */}
