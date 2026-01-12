@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ChefProfile, Dish } from '../types';
+import { ChefProfile, Dish, QAItem } from '../types';
+import { QASection } from './QASection';
 import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../lib/supabase';
@@ -7,6 +8,7 @@ import { trackEvent } from '../lib/supabase';
 interface ClientViewProps {
   chefProfile: ChefProfile;
   dishes: Dish[];
+  qaItems: QAItem[];
 }
 
 const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
@@ -107,7 +109,7 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
   );
 };
 
-export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) => {
+export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
 
   React.useEffect(() => {
@@ -230,6 +232,13 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes }) =
             </div>
           )}
         </div>
+
+        {/* Q&A Section */}
+        {chefProfile.show_qa && qaItems.length > 0 && (
+          <div className="mt-8">
+            <QASection items={qaItems} />
+          </div>
+        )}
 
         <footer className="mt-8 border-t border-white/5 pt-10 pb-20 px-4 text-center">
           <div className="flex justify-center gap-6 mb-8">

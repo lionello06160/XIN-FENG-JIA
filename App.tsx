@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClientView } from './components/ClientView';
-import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard } from './components/AdminView';
+import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard, QAManager, EditQAItem } from './components/AdminView';
 import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
-import { ChefProfile, Dish } from './types';
+import { ChefProfile, Dish, QAItem } from './types';
 import { supabase } from './lib/supabase';
 import { LoginView } from './components/LoginView';
 
@@ -11,6 +11,7 @@ const App: React.FC = () => {
   // Centralized State
   const [chefProfile, setChefProfile] = useState<ChefProfile>(INITIAL_CHEF_PROFILE);
   const [dishes, setDishes] = useState<Dish[]>(INITIAL_DISHES);
+  const [qaItems, setQaItems] = useState<QAItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -60,8 +61,21 @@ const App: React.FC = () => {
           cta_title: profileData.cta_title || '預約私廚體驗',
           cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
           order_link: profileData.order_link || '',
-          show_order_button: !!profileData.show_order_button
+          show_order_button: !!profileData.show_order_button,
+          show_qa: !!profileData.show_qa
         });
+      }
+
+      // Fetch QA Items
+      const { data: qaData, error: qaError } = await supabase
+        .from('qa_items')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (qaError) {
+        console.error('Error fetching QA:', qaError);
+      } else if (qaData) {
+        setQaItems(qaData as QAItem[]);
       }
 
       // Fetch Dishes
@@ -181,7 +195,8 @@ const App: React.FC = () => {
       cta_title: updatedProfile.cta_title,
       cta_description: updatedProfile.cta_description,
       order_link: updatedProfile.order_link,
-      show_order_button: updatedProfile.show_order_button
+      show_order_button: updatedProfile.show_order_button,
+      show_qa: updatedProfile.show_qa
     };
 
     // Remove undefined fields
@@ -199,6 +214,64 @@ const App: React.FC = () => {
     setChefProfile(prev => ({ ...prev, ...updatedProfile }));
   };
 
+  const handleUpdateQA = async (id: string, updatedData: Partial<QAItem>) => {
+    const { error } = await supabase
+      .from('qa_items')
+      .update(updatedData)
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating QA:', error);
+      return;
+    }
+    setQaItems(prev => prev.map(q => q.id === id ? { ...q, ...updatedData } : q));
+  };
+
+  const handleAddQA = async (newQA: Omit<QAItem, 'id'>) => {
+    const { data, error } = await supabase
+      .from('qa_items')
+      .insert([{ ...newQA, order_index: qaItems.length }])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding QA:', error);
+      return;
+    }
+    if (data) {
+      setQaItems(prev => [...prev, data as QAItem]);
+    }
+  };
+
+  const handleDeleteQA = async (id: string) => {
+    const { error } = await supabase
+      .from('qa_items')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting QA:', error);
+      return;
+    }
+    setQaItems(prev => prev.filter(q => q.id !== id));
+  };
+
+  const handleReorderQA = async (newQA: QAItem[]) => {
+    const reorderedWithIndex = newQA.map((item, index) => ({
+      ...item,
+      order_index: index
+    }));
+    setQaItems(reorderedWithIndex);
+    const { error } = await supabase
+      .from('qa_items')
+      .upsert(reorderedWithIndex);
+
+    if (error) {
+      console.error('Error reordering QA:', error);
+      alert('排序儲存失敗：' + error.message);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-display">
@@ -212,7 +285,7 @@ const App: React.FC = () => {
     <HashRouter>
       <Routes>
         {/* Client Side Routes */}
-        <Route path="/" element={<ClientView chefProfile={chefProfile} dishes={dishes} />} />
+        <Route path="/" element={<ClientView chefProfile={chefProfile} dishes={dishes} qaItems={qaItems} />} />
 
         {/* Admin Routes */}
         <Route
@@ -250,6 +323,26 @@ const App: React.FC = () => {
           element={
             isAuthenticated ? (
               <AnalyticsDashboard dishes={dishes} />
+            ) : (
+              <Navigate to="/admin" replace />
+            )
+          }
+        />
+        <Route
+          path="/admin/qa"
+          element={
+            isAuthenticated ? (
+              <QAManager qaItems={qaItems} onDeleteQA={handleDeleteQA} onReorderQA={handleReorderQA} />
+            ) : (
+              <Navigate to="/admin" replace />
+            )
+          }
+        />
+        <Route
+          path="/admin/qa/:id"
+          element={
+            isAuthenticated ? (
+              <EditQAItem qaItems={qaItems} onSave={handleUpdateQA} onAdd={handleAddQA} />
             ) : (
               <Navigate to="/admin" replace />
             )

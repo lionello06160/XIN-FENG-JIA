@@ -14,6 +14,14 @@ export interface Dish {
   is_new?: boolean;
 }
 
+export interface QAItem {
+  id: string;
+  created_at?: string;
+  question: string;
+  answer: string;
+  order_index: number;
+}
+
 export interface ChefProfile {
   name: string;
   title: string;
@@ -29,6 +37,7 @@ export interface ChefProfile {
   cta_description?: string;
   order_link?: string;
   show_order_button?: boolean;
+  show_qa?: boolean;
 }
 
 export interface AppContextType {

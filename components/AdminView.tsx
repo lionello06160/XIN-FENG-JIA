@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ChefProfile, Dish } from '../types';
+import { ChefProfile, Dish, QAItem } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -183,6 +183,10 @@ export const AdminDashboard = ({
         <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/admin/profile')}>
           <User size={24} />
           <span className="text-[10px] font-medium">個人資料</span>
+        </button>
+        <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/admin/qa')}>
+          <HelpCircle size={24} />
+          <span className="text-[10px] font-medium">Q&A 管理</span>
         </button>
         <button className="flex flex-col items-center gap-1 text-[#8a7560]" onClick={() => navigate('/')}>
           <Settings size={24} />
@@ -581,6 +585,26 @@ export const EditProfile = ({
             </label>
           )}
         </div>
+        <div className="flex flex-col gap-4 pt-2">
+          <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-3">
+              <HelpCircle className="text-admin-primary" size={20} />
+              <div className="flex flex-col">
+                <span className="text-[#181411] font-medium">顯示 Q&A 區塊</span>
+                <span className="text-gray-400 text-xs">開啟後首頁將出現 Q&A 區塊</span>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={formData.show_qa}
+                onChange={e => setFormData({ ...formData, show_qa: e.target.checked })}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="mt-8 px-4">
@@ -802,5 +826,178 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
         </div>
       </main>
     </div>
+  );
+};
+
+// --- Q&A Manager ---
+
+export const QAManager = ({
+  qaItems,
+  onDeleteQA,
+  onReorderQA
+}: {
+  qaItems: QAItem[];
+  onDeleteQA: (id: string) => void;
+  onReorderQA: (items: QAItem[]) => void;
+}) => {
+  const navigate = useNavigate();
+
+  const moveQA = (index: number, direction: 'up' | 'down') => {
+    const newItems = [...qaItems];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newItems.length) return;
+    [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
+    onReorderQA(newItems);
+  };
+
+  return (
+    <AdminLayout title="Q&A 管理" backTo="/admin">
+      <div className="px-4 py-4">
+        <Link to="/admin/qa/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
+          <PlusCircle size={24} />
+          <span className="font-bold tracking-wide">新增 Q&A</span>
+        </Link>
+      </div>
+
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <h3 className="text-[#181411] text-xl font-bold leading-tight tracking-tight">Q&A 列表</h3>
+        <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{qaItems.length} 項目</span>
+      </div>
+
+      <div className="flex flex-col gap-px bg-gray-100 pb-4">
+        {qaItems.map((item, index) => (
+          <div key={item.id} className="flex flex-col bg-white px-4 py-4 border-b border-gray-50">
+            <div className="flex items-center gap-3 justify-between">
+              <div className="flex items-center gap-3 overflow-hidden flex-1">
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    disabled={index === 0}
+                    onClick={() => moveQA(index, 'up')}
+                    className="p-1 rounded bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                  >
+                    <ChevronUp size={14} />
+                  </button>
+                  <button
+                    disabled={index === qaItems.length - 1}
+                    onClick={() => moveQA(index, 'down')}
+                    className="p-1 rounded bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                  >
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+
+                <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
+                  <p className="text-[#8a7560] text-[10px] font-medium mb-0.5">問題 Q{index + 1}</p>
+                  <p className="text-[#181411] text-base font-bold leading-tight truncate">{item.question}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={() => navigate(`/admin/qa/${item.id}`)}
+                  className="flex flex-col items-center justify-center rounded-lg h-12 w-12 bg-[#f5f2f0] text-[#181411] hover:bg-admin-primary/20 transition-colors"
+                >
+                  <Edit size={20} />
+                  <span className="text-[10px] font-bold">編輯</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (window.confirm('確定要刪除這項 Q&A 嗎？')) onDeleteQA(item.id);
+                  }}
+                  className="flex flex-col items-center justify-center rounded-lg h-12 w-12 bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                >
+                  <Trash size={20} />
+                  <span className="text-[10px] font-bold">刪除</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </AdminLayout>
+  );
+};
+
+// --- Edit Q&A Item ---
+
+export const EditQAItem = ({
+  qaItems,
+  onSave,
+  onAdd
+}: {
+  qaItems: QAItem[];
+  onSave: (id: string, data: Partial<QAItem>) => Promise<void>;
+  onAdd: (data: Omit<QAItem, 'id'>) => Promise<void>;
+}) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isNew = id === 'new';
+  const existingItem = qaItems.find(q => q.id === id);
+
+  const [formData, setFormData] = useState<Partial<QAItem>>(
+    existingItem || {
+      question: '',
+      answer: '',
+      order_index: qaItems.length
+    }
+  );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!formData.question || !formData.answer) {
+      alert('請填寫完整內容');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      if (isNew) {
+        await onAdd(formData as Omit<QAItem, 'id'>);
+      } else if (id) {
+        await onSave(id, formData);
+      }
+      navigate('/admin/qa');
+    } catch (error) {
+      alert('儲存失敗');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <AdminLayout title={isNew ? "新增 Q&A" : "編輯 Q&A"} backTo="/admin/qa">
+      <div className="px-4 py-6 space-y-6">
+        <label className="flex flex-col w-full gap-2">
+          <p className="text-[#181411] text-sm font-bold tracking-wider">問題內容</p>
+          <textarea
+            className="flex w-full rounded-lg border border-[#e6e0db] bg-white min-h-24 p-4 text-base focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none resize-none"
+            placeholder="例如：如何預約您的私廚服務？"
+            value={formData.question}
+            onChange={e => setFormData({ ...formData, question: e.target.value })}
+          />
+        </label>
+
+        <label className="flex flex-col w-full gap-2">
+          <p className="text-[#181411] text-sm font-bold tracking-wider">回答內容</p>
+          <textarea
+            className="flex w-full rounded-lg border border-[#e6e0db] bg-white min-h-48 p-4 text-base focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none resize-none leading-relaxed"
+            placeholder="例如：您可以透過首頁的 LINE 或 Facebook 連結直接聯繫主廚..."
+            value={formData.answer}
+            onChange={e => setFormData({ ...formData, answer: e.target.value })}
+          />
+        </label>
+
+        <div className="pt-4">
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="w-full bg-admin-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <Save size={20} />
+            {isSubmitting ? '處理中...' : '儲存 Q&A'}
+          </button>
+        </div>
+      </div>
+    </AdminLayout>
   );
 };

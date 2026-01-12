@@ -14,7 +14,8 @@ export const INITIAL_CHEF_PROFILE: ChefProfile = {
   cta_title: "預約私廚體驗",
   cta_description: "在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。",
   order_link: "",
-  show_order_button: false
+  show_order_button: false,
+  show_qa: false
 };
 
 export const INITIAL_DISHES: Dish[] = [
