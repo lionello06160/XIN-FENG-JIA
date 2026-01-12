@@ -434,7 +434,7 @@ export const EditDish = ({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-40">
           <div className="space-y-6">
             <label className="flex flex-col w-full gap-2">
               <p className="text-[#181411] text-sm font-bold tracking-wider">菜色名稱</p>
@@ -616,7 +616,7 @@ export const EditProfile = ({
 
   return (
     <AdminLayout title="主廚個人資料管理" backTo="/admin">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-32">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-40">
         <div className="lg:col-span-1">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-6 sticky top-24">
             {/* Avatar */}
@@ -915,7 +915,7 @@ export const ChangePassword = () => {
 
   return (
     <AdminLayout title="帳號安全設定" backTo="/admin">
-      <div className="p-6">
+      <div className="p-6 pb-40">
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center mb-6">
           <div className="w-16 h-16 bg-admin-primary/10 rounded-full flex items-center justify-center mb-4 text-admin-primary">
             <ShieldCheck size={32} />
@@ -1346,7 +1346,7 @@ export const EditQAItem = ({
 
   return (
     <AdminLayout title={isNew ? "新增 Q&A" : "編輯 Q&A"} backTo="/admin/qa">
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 space-y-6 pb-40">
         <label className="flex flex-col w-full gap-2">
           <p className="text-[#181411] text-sm font-bold tracking-wider">問題內容</p>
           <textarea
