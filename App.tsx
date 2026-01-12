@@ -6,6 +6,7 @@ import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
 import { ChefProfile, Dish, QAItem } from './types';
 import { supabase } from './lib/supabase';
 import { LoginView } from './components/LoginView';
+import { Analytics } from "@vercel/analytics/react"
 
 const App: React.FC = () => {
   // Centralized State
@@ -266,6 +267,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <Analytics />
       <Routes>
         {/* Client Side Routes */}
         <Route path="/" element={<ClientView chefProfile={chefProfile} dishes={dishes} qaItems={qaItems} />} />
