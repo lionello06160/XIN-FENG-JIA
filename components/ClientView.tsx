@@ -235,7 +235,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
 
         {/* Q&A Section */}
         {chefProfile.show_qa && qaItems.length > 0 && (
-          <div className="mt-8">
+          <div className="mt-2">
             <QASection items={qaItems} />
           </div>
         )}
