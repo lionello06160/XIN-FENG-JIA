@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { initIOSKeyboardFocusFix } from './lib/utils';
+
+// 初始化 iOS PWA 鍵盤修復
+initIOSKeyboardFocusFix();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
