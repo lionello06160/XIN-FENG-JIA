@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2
+  Info, Utensils, BarChart, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical
 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -10,6 +10,24 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart as RechartsBarChart, Bar, Legend, Cell
 } from 'recharts';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // --- Shared Components ---
 
@@ -42,6 +60,48 @@ const AdminLayout = ({ children, title, backTo, rightAction }: { children?: Reac
   );
 };
 
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+  className?: string;
+  key?: React.Key;
+}
+
+const SortableItem = ({ id, children, className }: SortableItemProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={className}>
+      <div className="relative group h-full">
+        {children}
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing border border-gray-100 shadow-sm z-10"
+          title="拖曳排序"
+        >
+          <GripVertical size={16} className="text-gray-400" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 // --- Dashboard ---
 
 export const AdminDashboard = ({
@@ -67,6 +127,28 @@ export const AdminDashboard = ({
     [newDishes[index], newDishes[targetIndex]] = [newDishes[targetIndex], newDishes[index]];
 
     onReorderDishes(newDishes);
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = dishes.findIndex((item) => item.id === active.id);
+      const newIndex = dishes.findIndex((item) => item.id === over.id);
+
+      onReorderDishes(arrayMove(dishes, oldIndex, newIndex));
+    }
   };
 
   return (
@@ -101,80 +183,93 @@ export const AdminDashboard = ({
         </div>
 
         {/* List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
-          {dishes.map((dish, index) => (
-            <div key={dish.id} className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-              <div className="flex items-center gap-3 justify-between mb-4">
-                <div className="flex items-center gap-3 overflow-hidden flex-1">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={dishes.map(d => d.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8">
+              {dishes.map((dish, index) => (
+                <SortableItem key={dish.id} id={dish.id}>
+                  <div className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md h-full">
+                    <div className="flex items-center gap-3 justify-between mb-4">
+                      <div className="flex items-center gap-3 overflow-hidden flex-1 pl-4">
 
-                  {/* Sort Controls */}
-                  <div className="flex flex-col gap-1 shrink-0">
-                    <button
-                      disabled={index === 0}
-                      onClick={() => moveDish(index, 'up')}
-                      className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                      title="上移"
-                    >
-                      <ChevronUp size={14} />
-                    </button>
-                    <button
-                      disabled={index === dishes.length - 1}
-                      onClick={() => moveDish(index, 'down')}
-                      className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                      title="下移"
-                    >
-                      <ChevronDown size={14} />
-                    </button>
-                  </div>
-
-                  <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-14 shrink-0 bg-gray-200 border border-gray-50" style={{ backgroundImage: `url("${dish.image}")` }}></div>
-                  <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 overflow-hidden">
-                      <p className="text-[#181411] text-base font-bold leading-tight truncate">{dish.name}</p>
-                      {!!dish.spiciness && dish.spiciness > 0 && (
-                        <div className="flex shrink-0">
-                          {Array.from({ length: dish.spiciness }).map((_, i) => (
-                            <span key={i} className="text-[10px]">🌶️</span>
-                          ))}
+                        {/* Sort Controls (Fallback) */}
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <button
+                            disabled={index === 0}
+                            onClick={() => moveDish(index, 'up')}
+                            className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                            title="上移"
+                          >
+                            <ChevronUp size={14} />
+                          </button>
+                          <button
+                            disabled={index === dishes.length - 1}
+                            onClick={() => moveDish(index, 'down')}
+                            className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                            title="下移"
+                          >
+                            <ChevronDown size={14} />
+                          </button>
                         </div>
-                      )}
+
+                        <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-14 shrink-0 bg-gray-200 border border-gray-50" style={{ backgroundImage: `url("${dish.image}")` }}></div>
+                        <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 overflow-hidden">
+                            <p className="text-[#181411] text-base font-bold leading-tight truncate">{dish.name}</p>
+                            {!!dish.spiciness && dish.spiciness > 0 && (
+                              <div className="flex shrink-0">
+                                {Array.from({ length: dish.spiciness }).map((_, i) => (
+                                  <span key={i} className="text-[10px]">🌶️</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <div className={`size-1.5 rounded-full ${dish.available ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            <span className={`text-[10px] font-bold ${dish.available ? 'text-green-600' : 'text-red-500'}`}>
+                              {dish.available ? '供應中' : '已售罄'}
+                            </span>
+                            {dish.is_new && (
+                              <span className="bg-gold text-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-gold shadow-sm ml-0.5">
+                                NEW
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <div className={`size-1.5 rounded-full ${dish.available ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                      <span className={`text-[10px] font-bold ${dish.available ? 'text-green-600' : 'text-red-500'}`}>
-                        {dish.available ? '供應中' : '已售罄'}
-                      </span>
-                      {dish.is_new && (
-                        <span className="bg-gold text-black text-[8px] font-black px-1.5 py-0.5 rounded-full border border-gold shadow-sm ml-0.5">
-                          NEW
-                        </span>
-                      )}
+
+                    <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
+                      <button
+                        onClick={() => navigate(`/admin/dish/${dish.id}`)}
+                        className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
+                      >
+                        <Edit size={16} />
+                        <span>編輯</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm('確定要刪除這道菜色嗎？')) onDeleteDish(dish.id);
+                        }}
+                        className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
+                      >
+                        <Trash size={16} />
+                        <span>刪除</span>
+                      </button>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50">
-                <button
-                  onClick={() => navigate(`/admin/dish/${dish.id}`)}
-                  className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
-                >
-                  <Edit size={16} />
-                  <span>編輯</span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (window.confirm('確定要刪除這道菜色嗎？')) onDeleteDish(dish.id);
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
-                >
-                  <Trash size={16} />
-                  <span>刪除</span>
-                </button>
-              </div>
+                </SortableItem>
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
 
         {/* Info Box */}
         <div className="mx-4 mt-4 px-4 py-3 bg-admin-primary/10 text-admin-primary flex items-center gap-3 rounded-lg">
@@ -1095,6 +1190,26 @@ export const QAManager = ({
     onReorderQA(newItems);
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = qaItems.findIndex((item) => item.id === active.id);
+      const newIndex = qaItems.findIndex((item) => item.id === over.id);
+      onReorderQA(arrayMove(qaItems, oldIndex, newIndex));
+    }
+  };
+
   return (
     <AdminLayout title="Q&A 管理" backTo="/admin">
       <div className="px-4 py-4">
@@ -1109,56 +1224,69 @@ export const QAManager = ({
         <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{qaItems.length} 項目</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 pb-8">
-        {qaItems.map((item, index) => (
-          <div key={item.id} className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-            <div className="flex items-center gap-3 justify-between mb-4">
-              <div className="flex items-center gap-3 overflow-hidden flex-1">
-                <div className="flex flex-col gap-1 shrink-0">
-                  <button
-                    disabled={index === 0}
-                    onClick={() => moveQA(index, 'up')}
-                    className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                  >
-                    <ChevronUp size={14} />
-                  </button>
-                  <button
-                    disabled={index === qaItems.length - 1}
-                    onClick={() => moveQA(index, 'down')}
-                    className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
-                  >
-                    <ChevronDown size={14} />
-                  </button>
-                </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={qaItems.map(item => item.id)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 pb-8">
+            {qaItems.map((item, index) => (
+              <SortableItem key={item.id} id={item.id}>
+                <div className="flex flex-col bg-white p-4 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md h-full">
+                  <div className="flex items-center gap-3 justify-between mb-4">
+                    <div className="flex items-center gap-3 overflow-hidden flex-1 pl-4">
+                      <div className="flex flex-col gap-1 shrink-0">
+                        <button
+                          disabled={index === 0}
+                          onClick={() => moveQA(index, 'up')}
+                          className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronUp size={14} />
+                        </button>
+                        <button
+                          disabled={index === qaItems.length - 1}
+                          onClick={() => moveQA(index, 'down')}
+                          className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:bg-admin-primary/10 hover:text-admin-primary disabled:opacity-20 transition-colors"
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                      </div>
 
-                <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
-                  <p className="text-[#8a7560] text-[10px] font-medium mb-0.5">問題 Q{index + 1}</p>
-                  <p className="text-[#181411] text-base font-bold leading-tight truncate">{item.question}</p>
-                </div>
-              </div>
-            </div>
+                      <div className="flex flex-col justify-center overflow-hidden flex-1 min-w-0">
+                        <p className="text-[#8a7560] text-[10px] font-medium mb-0.5">問題 Q{index + 1}</p>
+                        <p className="text-[#181411] text-base font-bold leading-tight truncate">{item.question}</p>
+                      </div>
+                    </div>
+                  </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50">
-              <button
-                onClick={() => navigate(`/admin/qa/${item.id}`)}
-                className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
-              >
-                <Edit size={16} />
-                <span>編輯</span>
-              </button>
-              <button
-                onClick={() => {
-                  if (window.confirm('確定要刪除這項 Q&A 嗎？')) onDeleteQA(item.id);
-                }}
-                className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
-              >
-                <Trash size={16} />
-                <span>刪除</span>
-              </button>
-            </div>
+                  <div className="grid grid-cols-2 gap-2 pt-4 border-t border-gray-50 mt-auto">
+                    <button
+                      onClick={() => navigate(`/admin/qa/${item.id}`)}
+                      className="flex items-center justify-center gap-2 rounded-xl h-11 bg-gray-50 text-[#181411] font-bold text-sm hover:bg-admin-primary/10 hover:text-admin-primary transition-all active:scale-95"
+                    >
+                      <Edit size={16} />
+                      <span>編輯</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('確定要刪除這項 Q&A 嗎？')) onDeleteQA(item.id);
+                      }}
+                      className="flex items-center justify-center gap-2 rounded-xl h-11 bg-red-50 text-red-500 font-bold text-sm hover:bg-red-100 transition-all active:scale-95"
+                    >
+                      <Trash size={16} />
+                      <span>刪除</span>
+                    </button>
+                  </div>
+                </div>
+              </SortableItem>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </AdminLayout>
   );
 };
