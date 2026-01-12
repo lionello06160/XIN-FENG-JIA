@@ -98,23 +98,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-
-    // Listen for visibility changes to refresh data when user returns to the app
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        console.log('App became visible, refreshing data...');
-        fetchData();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    // Also listen for focus event for some browsers/scenarios
-    window.addEventListener('focus', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleVisibilityChange);
-    };
   }, []);
 
   // Actions
