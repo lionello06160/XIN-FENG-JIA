@@ -63,7 +63,8 @@ const App: React.FC = () => {
           cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
           order_link: profileData.order_link || '',
           show_order_button: !!profileData.show_order_button,
-          show_qa: !!profileData.show_qa
+          show_qa: !!profileData.show_qa,
+          show_cta: profileData.show_cta !== false // Default to true if null/undefined
         });
       }
 
@@ -180,7 +181,8 @@ const App: React.FC = () => {
       cta_description: updatedProfile.cta_description,
       order_link: updatedProfile.order_link,
       show_order_button: updatedProfile.show_order_button,
-      show_qa: updatedProfile.show_qa
+      show_qa: updatedProfile.show_qa,
+      show_cta: updatedProfile.show_cta
     };
 
     // Remove undefined fields

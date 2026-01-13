@@ -227,26 +227,28 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
 
         {/* CTA Section */}
-        <div className="px-4 py-8">
-          <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
-            <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
-            <p className="text-sm text-white/80">{chefProfile.cta_description}</p>
-          </div>
-
-          {showOrderCta && (
-            <div className="px-2 pt-6 hidden md:block">
-              <a
-                href={chefProfile.order_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all motion-reduce:transition-none uppercase tracking-widest flex items-center justify-center gap-2"
-              >
-                <ShoppingCart size={18} />
-                立即訂購
-              </a>
+        {chefProfile.show_cta !== false && (
+          <div className="px-4 py-8">
+            <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
+              <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
+              <p className="text-sm text-white/70">{chefProfile.cta_description}</p>
             </div>
-          )}
-        </div>
+
+            {chefProfile.show_order_button && chefProfile.order_link && (
+              <div className="px-2 pt-6">
+                <a
+                  href={chefProfile.order_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={18} />
+                  立即訂購
+                </a>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Q&A Section */}
         {chefProfile.show_qa && qaItems.length > 0 && (

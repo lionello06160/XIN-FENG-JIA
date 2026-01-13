@@ -38,6 +38,7 @@ export interface ChefProfile {
   order_link?: string;
   show_order_button?: boolean;
   show_qa?: boolean;
+  show_cta?: boolean;
 }
 
 export interface AppContextType {
