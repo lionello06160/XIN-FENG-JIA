@@ -82,7 +82,7 @@ const AdminBottomNav = () => {
 const AdminLayout = ({ children, title, backTo, leftAction, rightAction }: { children?: React.ReactNode, title: string, backTo?: string, leftAction?: React.ReactNode, rightAction?: React.ReactNode }) => {
   const navigate = useNavigate();
   return (
-    <div className="relative flex h-auto min-h-screen w-full flex-col bg-admin-bg font-display text-[#181411]">
+    <div className="relative flex h-auto min-h-screen w-full flex-col bg-admin-bg font-sans text-[#181411]">
       <header className="sticky top-0 z-50 flex items-center bg-white/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100">
         <div className="flex size-12 shrink-0 items-center">
           {leftAction ? (
@@ -147,7 +147,7 @@ const SortableItem = ({ id, children, className }: SortableItemProps) => {
         <div
           {...attributes}
           {...listeners}
-          className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing border border-gray-100 shadow-sm z-10"
+          className="absolute top-2 left-2 p-1.5 bg-white/80 backdrop-blur-sm rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity motion-reduce:transition-none cursor-grab active:cursor-grabbing border border-gray-100 shadow-sm z-10"
           title="拖曳排序"
         >
           <GripVertical size={16} className="text-gray-400" />
@@ -452,10 +452,13 @@ export const EditDish = ({
                 <input
                   className="flex w-full border border-[#e6e0db] bg-white h-14 px-4 text-base focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
                   type="number"
+                  inputMode="numeric"
+                  placeholder="1200"
                   value={formData.price || 0}
                   onChange={e => setFormData({ ...formData, price: Number(e.target.value) })}
                 />
               </div>
+              <p className="text-[11px] text-[#8a7560] px-1">格式：NT$ 1200</p>
             </label>
 
             <label className="flex flex-col w-full gap-2">
@@ -553,15 +556,17 @@ export const EditDish = ({
         </div>
       </div>
 
-      <div className="mt-12 border-t border-gray-100 pt-8 pb-12">
-        <button
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="w-full md:max-w-xs mx-auto bg-admin-primary text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-admin-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-        >
-          <Save size={20} />
-          {isSubmitting ? '正在處理...' : '儲存菜色資料'}
-        </button>
+      <div className="sticky bottom-24 z-40 mt-10 -mx-4 md:-mx-8">
+        <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 md:px-8 py-4 shadow-[0_-10px_30px_-20px_rgba(0,0,0,0.35)]">
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="w-full md:max-w-xs mx-auto bg-admin-primary text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-admin-primary/20 active:scale-[0.98] transition-all motion-reduce:transition-none flex items-center justify-center gap-3 disabled:opacity-50"
+          >
+            <Save size={20} />
+            {isSubmitting ? '正在處理...' : '儲存菜色資料'}
+          </button>
+        </div>
       </div>
     </AdminLayout>
   );
@@ -819,15 +824,17 @@ export const EditProfile = ({
         </div>
       </div>
 
-      <div className="mt-8 border-t border-gray-100 pt-8">
-        <button
-          onClick={handleSave}
-          disabled={isSubmitting}
-          className="w-full md:max-w-xs mx-auto bg-admin-primary text-white font-bold py-4 rounded-2xl shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-        >
-          <Save size={20} />
-          {isSubmitting ? '正在儲存中...' : '儲存主廚個人資料'}
-        </button>
+      <div className="sticky bottom-24 z-40 mt-10 -mx-4 md:-mx-8">
+        <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 md:px-8 py-4 shadow-[0_-10px_30px_-20px_rgba(0,0,0,0.35)]">
+          <button
+            onClick={handleSave}
+            disabled={isSubmitting}
+            className="w-full md:max-w-xs mx-auto bg-admin-primary text-white font-bold py-4 rounded-2xl shadow-xl active:scale-[0.98] transition-all motion-reduce:transition-none flex items-center justify-center gap-3 disabled:opacity-50"
+          >
+            <Save size={20} />
+            {isSubmitting ? '正在儲存中...' : '儲存主廚個人資料'}
+          </button>
+        </div>
       </div>
     </AdminLayout>
   );
@@ -1003,7 +1010,7 @@ export const ChangePassword = () => {
             </label>
 
             {error && (
-              <div className="p-3 bg-red-50 text-red-500 text-sm rounded-lg text-center font-bold animate-pulse">
+              <div role="alert" className="p-3 bg-red-50 text-red-500 text-sm rounded-lg text-center font-bold animate-pulse motion-reduce:animate-none">
                 {error}
               </div>
             )}

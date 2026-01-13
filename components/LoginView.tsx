@@ -39,7 +39,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     };
 
     return (
-        <div className="relative flex h-screen w-full flex-col justify-center items-center overflow-hidden bg-[#221910] font-['Manrope']">
+        <div className="relative flex h-screen w-full flex-col justify-center items-center overflow-hidden bg-[#221910] font-sans">
             {/* Background */}
             <div className="absolute inset-0 z-0">
                 <div
@@ -110,14 +110,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
                         </div>
 
                         {error && (
-                            <p className="text-red-500 text-sm text-center font-medium animate-pulse">{error}</p>
+                            <p role="alert" className="text-red-500 text-sm text-center font-medium animate-pulse motion-reduce:animate-none">{error}</p>
                         )}
 
                         <div className="pt-4">
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-[#f27f0d] text-[#221910] text-lg font-bold leading-normal tracking-wider transition-transform active:scale-95 shadow-lg shadow-[#f27f0d]/20 disabled:opacity-50"
+                                className="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-5 bg-[#f27f0d] text-[#221910] text-lg font-bold leading-normal tracking-wider transition-transform motion-reduce:transition-none active:scale-95 shadow-lg shadow-[#f27f0d]/20 disabled:opacity-50"
                             >
                                 <span className="truncate">{loading ? '登入中...' : '登入系統'}</span>
                             </button>

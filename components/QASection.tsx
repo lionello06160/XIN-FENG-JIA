@@ -31,12 +31,14 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
                                 <button
                                     onClick={() => setOpenId(isOpen ? null : item.id)}
                                     className="w-full flex items-center justify-between p-5 text-left focus:outline-none group"
+                                    aria-expanded={isOpen}
+                                    aria-controls={`qa-${item.id}`}
                                 >
                                     <div className="flex items-start gap-2 pr-4">
                                         <span className="text-gold font-bold whitespace-nowrap">Q{index + 1}:</span>
                                         <span className="text-white font-medium leading-relaxed">{item.question}</span>
                                     </div>
-                                    <div className={`shrink-0 w-8 h-8 rounded-full border border-gold/20 flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-gold border-gold scale-110' : 'bg-gold/5 group-hover:bg-gold/20'}`}>
+                                    <div className={`shrink-0 w-8 h-8 rounded-full border border-gold/20 flex items-center justify-center transition-all duration-300 motion-reduce:transition-none ${isOpen ? 'bg-gold border-gold scale-110' : 'bg-gold/5 group-hover:bg-gold/20'}`}>
                                         {isOpen ? (
                                             <Minus size={16} className="text-black" />
                                         ) : (
@@ -46,12 +48,15 @@ export const QASection: React.FC<QASectionProps> = ({ items }) => {
                                 </button>
 
                                 <div
-                                    className={`transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                    id={`qa-${item.id}`}
+                                    className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out motion-reduce:transition-none ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                                 >
-                                    <div className="p-5 mt-1 flex items-center">
-                                        <p className="text-gray-300 text-sm leading-relaxed pl-7">
-                                            {item.answer}
-                                        </p>
+                                    <div className="overflow-hidden">
+                                        <div className="p-5 mt-1 flex items-center">
+                                            <p className="text-white/80 text-sm leading-relaxed pl-7">
+                                                {item.answer}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

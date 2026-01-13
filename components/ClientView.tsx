@@ -17,18 +17,18 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#2d241a] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-xl bg-white dark:bg-[#2d241a] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-300 motion-reduce:animate-none motion-reduce:transition-none" role="dialog" aria-modal="true" aria-label={`${dish.name} 詳細內容`}>
 
         {/* Close Button */}
         <div className="absolute top-4 right-4 z-30">
-          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-black/20 backdrop-blur-md text-white border border-white/20 transition-colors hover:bg-black/40">
+          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-black/20 backdrop-blur-md text-white border border-white/20 transition-colors motion-reduce:transition-none hover:bg-black/40">
             <X size={20} />
           </button>
         </div>
 
         {/* Hero Image */}
         <div className="relative w-full aspect-[4/3] shrink-0">
-          <div className="w-full h-full bg-center bg-no-repeat bg-cover" style={{ backgroundImage: `url("${dish.image}")` }}></div>
+          <div className="w-full h-full bg-center bg-no-repeat bg-cover" style={{ backgroundImage: `url("${dish.image}")` }} role="img" aria-label={`菜色圖片：${dish.name}`}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
         </div>
 
@@ -111,6 +111,7 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
 
 export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
+  const showOrderCta = chefProfile.show_order_button && !!chefProfile.order_link;
 
   React.useEffect(() => {
     trackEvent('page_view');
@@ -140,7 +141,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto pb-12 px-4 md:px-8">
+      <main className={`max-w-6xl mx-auto ${showOrderCta ? 'pb-24' : 'pb-12'} px-4 md:px-8`}>
 
         {/* Hero Section */}
         <div className="py-6 md:py-10">
@@ -149,10 +150,17 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
             style={{
               backgroundImage: `linear-gradient(0deg, rgba(18, 18, 18, 1) 0%, rgba(18, 18, 18, 0.4) 40%, rgba(0, 0, 0, 0) 70%), url("${chefProfile.image}")`
             }}
+            role="img"
+            aria-label={`主廚形象照：${chefProfile.name}`}
           >
             <div className="flex flex-col p-6 md:p-12 gap-3 md:max-w-2xl">
-              <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md">{chefProfile.name}</h2>
-              <p className="text-gray-300 text-sm md:text-base font-light leading-relaxed max-w-md">
+              <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md font-display">{chefProfile.name}</h2>
+              {chefProfile.title && (
+                <p className="text-gold/90 text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
+                  {chefProfile.title}
+                </p>
+              )}
+              <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-md">
                 {chefProfile.bio}
               </p>
             </div>
@@ -162,7 +170,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         {/* Menu Section Header */}
         <div className="flex items-center justify-center gap-6 px-4 pt-8 pb-4">
           <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
-          <h3 className="text-white text-2xl font-bold tracking-[0.2em] text-center whitespace-nowrap uppercase">主廚精選</h3>
+          <h3 className="text-white text-2xl font-bold tracking-[0.2em] text-center whitespace-nowrap uppercase font-display">主廚精選</h3>
           <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
         </div>
 
@@ -171,12 +179,19 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
           {dishes.map((dish) => (
             <div key={dish.id} className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group">
               <div
-                className="bg-cover bg-center aspect-[16/9] transition-transform duration-700 group-hover:scale-105 relative"
+                className="bg-cover bg-center aspect-[16/9] transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none relative"
                 style={{ backgroundImage: `url("${dish.image}")` }}
+                role="img"
+                aria-label={`菜色圖片：${dish.name}`}
               >
                 {dish.is_new && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-fade-in">
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-fade-in motion-reduce:animate-none">
                     <span className="text-xs font-bold text-white drop-shadow-md tracking-wider">✨ 新品上市</span>
+                  </div>
+                )}
+                {!dish.available && (
+                  <div className="absolute top-3 right-3 bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full border-2 border-gold/70 shadow-lg">
+                    已售罄
                   </div>
                 )}
               </div>
@@ -194,7 +209,6 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
                         </div>
                       )}
                     </div>
-                    {!dish.available && <span className="text-xs text-red-500 font-bold mt-1 inline-block border border-red-500 px-2 py-0.5 rounded">售罄</span>}
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">價格</span>
@@ -203,7 +217,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
                 </div>
                 <button
                   onClick={() => handleDishClick(dish)}
-                  className="w-full py-3 bg-gold/10 border border-gold/30 text-gold rounded-xl text-sm font-bold active:bg-gold active:text-black hover:bg-gold hover:text-black transition-all"
+                  className="w-full py-3 bg-gold/10 border border-gold/30 text-gold rounded-xl text-sm font-bold active:bg-gold active:text-black hover:bg-gold hover:text-black transition-all motion-reduce:transition-none"
                 >
                   查看詳情
                 </button>
@@ -216,16 +230,16 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         <div className="px-4 py-8">
           <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
             <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
-            <p className="text-sm text-white/70">{chefProfile.cta_description}</p>
+            <p className="text-sm text-white/80">{chefProfile.cta_description}</p>
           </div>
 
-          {chefProfile.show_order_button && chefProfile.order_link && (
-            <div className="px-2 pt-6">
+          {showOrderCta && (
+            <div className="px-2 pt-6 hidden md:block">
               <a
                 href={chefProfile.order_link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest flex items-center justify-center gap-2"
+                className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all motion-reduce:transition-none uppercase tracking-widest flex items-center justify-center gap-2"
               >
                 <ShoppingCart size={18} />
                 立即訂購
@@ -272,6 +286,22 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
           </div>
         </footer>
       </main >
+
+      {showOrderCta && (
+        <div className="fixed bottom-0 inset-x-0 z-50 md:hidden">
+          <div className="bg-luxury-dark/95 backdrop-blur-md border-t border-gold/20 px-4 pt-3 pb-4" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}>
+            <a
+              href={chefProfile.order_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-gold text-black font-black py-3 rounded-xl shadow-lg shadow-gold/20 active:scale-[0.98] transition-all motion-reduce:transition-none uppercase tracking-widest flex items-center justify-center gap-2"
+            >
+              <ShoppingCart size={18} />
+              立即訂購
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Modal Overlay */}
       {
