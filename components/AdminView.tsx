@@ -57,22 +57,29 @@ const AdminBottomNav = () => {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center justify-center flex-1 gap-1.5 transition-colors ${isActive ? 'text-admin-primary' : 'text-[#8a7560]'
-                }`}
+              className="flex flex-col items-center justify-center flex-1 gap-1 group relative h-full"
             >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-              <span className={`text-[10px] font-bold ${isActive ? 'text-admin-primary' : 'text-[#8a7560]'}`}>
+              <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-admin-primary/10 scale-110 text-admin-primary' : 'text-[#8a7560] group-hover:bg-gray-50'
+                }`}>
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} className="transition-transform duration-300" />
+              </div>
+              <span className={`text-[10px] font-bold transition-colors duration-300 ${isActive ? 'text-admin-primary' : 'text-[#8a7560]'}`}>
                 {item.label}
               </span>
+              {isActive && (
+                <div className="absolute bottom-1 w-1 h-1 bg-admin-primary rounded-full animate-in fade-in zoom-in duration-300" />
+              )}
             </button>
           );
         })}
         <button
           onClick={handleHome}
-          className="flex flex-col items-center justify-center flex-1 gap-1.5 text-[#8a7560] hover:text-admin-primary transition-colors"
+          className="flex flex-col items-center justify-center flex-1 gap-1 text-[#8a7560] group relative h-full"
         >
-          <Home size={20} />
-          <span className="text-[10px] font-bold">首頁</span>
+          <div className="p-2 rounded-xl transition-all group-hover:bg-gray-50 group-hover:scale-110 group-hover:text-admin-primary">
+            <Home size={20} />
+          </div>
+          <span className="text-[10px] font-bold group-hover:text-admin-primary transition-colors">首頁</span>
         </button>
       </div>
     </nav>
@@ -608,7 +615,7 @@ export const EditProfile = ({
     setIsSubmitting(true);
     try {
       await onSave(formData);
-      navigate('/admin');
+      alert('個人資料已成功儲存');
     } catch (error) {
       alert('更新個人資料失敗');
     } finally {
@@ -617,7 +624,7 @@ export const EditProfile = ({
   };
 
   return (
-    <AdminLayout title="主廚個人資料管理" backTo="/admin">
+    <AdminLayout title="主廚個人資料管理">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-40">
         <div className="lg:col-span-1">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-6 sticky top-24">
@@ -935,11 +942,6 @@ export const ChangePassword = () => {
       setNewPassword('');
       setConfirmPassword('');
 
-      // Optional: Redirect after delay
-      setTimeout(() => {
-        navigate('/admin');
-      }, 2000);
-
     } catch (err) {
       console.error('Password change error:', err);
       setError('修改失敗，請稍後再試');
@@ -949,7 +951,7 @@ export const ChangePassword = () => {
   };
 
   return (
-    <AdminLayout title="帳號安全設定" backTo="/admin">
+    <AdminLayout title="帳號安全設定">
       <div className="p-6 pb-40">
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center mb-6">
           <div className="w-16 h-16 bg-admin-primary/10 rounded-full flex items-center justify-center mb-4 text-admin-primary">
@@ -1156,7 +1158,7 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
   }
 
   return (
-    <AdminLayout title="數據分析報表" backTo="/admin">
+    <AdminLayout title="數據分析報表">
       <main className="max-w-6xl mx-auto p-4 md:p-8 flex flex-col lg:grid lg:grid-cols-2 gap-6 pb-24">
         {/* Time Range Selector */}
         <div className="col-span-full">
@@ -1268,7 +1270,7 @@ export const QAManager = ({
   };
 
   return (
-    <AdminLayout title="Q&A 管理" backTo="/admin">
+    <AdminLayout title="Q&A 管理">
       <div className="px-4 py-4">
         <Link to="/admin/qa/new" className="flex items-center justify-center rounded-xl h-16 bg-admin-primary text-white gap-3 shadow-lg shadow-admin-primary/20 hover:scale-[0.99] transition-transform active:scale-95 w-full">
           <PlusCircle size={24} />
