@@ -794,22 +794,20 @@ export const EditProfile = ({
               </div>
             </div>
 
-            {formData.show_order_button && (
-              <label className="flex flex-col w-full gap-2">
-                <p className="text-[#181411] text-sm font-bold px-1">訂購連結 (URL)</p>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <LinkIcon size={18} />
-                  </div>
-                  <input
-                    className="flex w-full rounded-xl border border-[#e6e0db] bg-white h-12 pl-12 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
-                    value={formData.order_link || ''}
-                    onChange={e => setFormData({ ...formData, order_link: e.target.value })}
-                    placeholder="例如：https://order.page/julian"
-                  />
+            <label className="flex flex-col w-full gap-2">
+              <p className="text-[#181411] text-sm font-bold px-1">訂購連結 (URL)</p>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <LinkIcon size={18} />
                 </div>
-              </label>
-            )}
+                <input
+                  className="flex w-full rounded-xl border border-[#e6e0db] bg-white h-12 pl-12 pr-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none"
+                  value={formData.order_link || ''}
+                  onChange={e => setFormData({ ...formData, order_link: e.target.value })}
+                  placeholder="例如：https://order.page/julian"
+                />
+              </div>
+            </label>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
