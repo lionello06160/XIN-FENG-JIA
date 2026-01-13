@@ -1121,12 +1121,27 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
       }
     });
 
-    return Object.entries(stats)
-      .map(([id, count]) => {
-        const dish = dishes.find(d => d.id === id);
-        return { name: dish?.name || '未知菜色', count };
-      })
-      .sort((a, b) => b.count - a.count);
+    const rankedDishes = dishes.map(dish => ({
+      id: dish.id,
+      name: dish.name,
+      count: stats[dish.id] || 0,
+      orderIndex: dish.order_index ?? 0
+    }));
+
+    const unknownDishes = Object.entries(stats)
+      .filter(([id]) => !dishes.find(dish => dish.id === id))
+      .map(([id, count]) => ({
+        id,
+        name: '未知菜色',
+        count,
+        orderIndex: Number.MAX_SAFE_INTEGER
+      }));
+
+    return [...rankedDishes, ...unknownDishes].sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex;
+      return a.name.localeCompare(b.name, 'zh-Hant');
+    });
   };
 
   const chartData = processChartData();
@@ -1184,8 +1199,8 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
           <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">熱門菜色排名</h3>
           <div className="flex flex-col gap-4">
-            {dishStats.slice(0, 5).map((stat, idx) => (
-              <div key={stat.name} className="flex items-center gap-4">
+            {dishStats.map((stat, idx) => (
+              <div key={stat.id} className="flex items-center gap-4">
                 <span className={`text-sm font-black w-6 ${idx < 3 ? 'text-admin-primary' : 'text-gray-300'}`}>{String(idx + 1).padStart(2, '0')}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between mb-1">
@@ -1195,7 +1210,7 @@ export const AnalyticsDashboard = ({ dishes }: { dishes: Dish[] }) => {
                   <div className="w-full bg-gray-50 h-2 rounded-full overflow-hidden">
                     <div
                       className="bg-admin-primary h-full rounded-full transition-all duration-1000"
-                      style={{ width: `${(stat.count / (dishStats[0]?.count || 1)) * 100}%` }}
+                      style={{ width: `${dishStats[0]?.count ? (stat.count / dishStats[0].count) * 100 : 0}%` }}
                     ></div>
                   </div>
                 </div>
