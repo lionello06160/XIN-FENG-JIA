@@ -225,7 +225,7 @@ export const AdminDashboard = ({
       {/* List Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <h3 className="text-[#181411] text-xl font-bold leading-tight tracking-tight">菜單列表</h3>
-        <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{dishes.length} / 20 項目</span>
+        <span className="bg-admin-primary/10 text-admin-primary px-3 py-1 rounded-full text-xs font-bold">{dishes.length} 項目</span>
       </div>
 
       {/* List */}
@@ -320,7 +320,7 @@ export const AdminDashboard = ({
       {/* Info Box */}
       <div className="mx-4 mt-4 px-4 py-3 bg-admin-primary/10 text-admin-primary flex items-center gap-3 rounded-lg">
         <Info size={20} />
-        <p className="text-xs font-medium">您可以繼續新增菜色，直到達到上限。</p>
+        <p className="text-xs font-medium">您可以自由新增更多菜色。</p>
       </div>
     </AdminLayout>
   );
