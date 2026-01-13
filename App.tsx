@@ -64,7 +64,8 @@ const App: React.FC = () => {
           order_link: profileData.order_link || '',
           show_order_button: !!profileData.show_order_button,
           show_qa: !!profileData.show_qa,
-          show_cta: profileData.show_cta !== false // Default to true if null/undefined
+          show_cta: profileData.show_cta !== false,
+          store_name: profileData.store_name ?? ''
         });
       }
 
@@ -182,7 +183,8 @@ const App: React.FC = () => {
       order_link: updatedProfile.order_link,
       show_order_button: updatedProfile.show_order_button,
       show_qa: updatedProfile.show_qa,
-      show_cta: updatedProfile.show_cta
+      show_cta: updatedProfile.show_cta,
+      store_name: updatedProfile.store_name
     };
 
     // Remove undefined fields
@@ -260,9 +262,15 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-display">
-        <div className="mb-4 text-[#a67c52] text-xl font-bold tracking-[0.4em] uppercase">鑫蘴家</div>
-        <div className="text-xl font-light tracking-[0.2em] animate-pulse text-white/40">LOADING</div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-sans">
+        <div className="relative flex flex-col items-center">
+          {chefProfile.store_name && (
+            <div className="absolute bottom-full mb-4 text-[#a67c52] text-xl font-bold tracking-[0.4em] uppercase">
+              {chefProfile.store_name}
+            </div>
+          )}
+          <div className="loading-flow text-xl font-light tracking-[0.2em] uppercase">LOADING.....</div>
+        </div>
       </div>
     );
   }
@@ -281,7 +289,7 @@ const App: React.FC = () => {
             isAuthenticated ? (
               <AdminDashboard chefProfile={chefProfile} dishes={dishes} onDeleteDish={handleDeleteDish} onReorderDishes={handleReorderDishes} />
             ) : (
-              <LoginView onLoginSuccess={handleLoginSuccess} />
+              <LoginView onLoginSuccess={handleLoginSuccess} storeName={chefProfile.store_name || '鑫蘴家'} />
             )
           }
         />

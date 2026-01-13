@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS chef_profile (
     email TEXT,
     cta_title TEXT DEFAULT '預約私廚體驗',
     cta_description TEXT DEFAULT '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
+    show_cta BOOLEAN DEFAULT true,
     order_link TEXT DEFAULT '',
     show_order_button BOOLEAN DEFAULT false
 );

@@ -39,6 +39,7 @@ export interface ChefProfile {
   show_order_button?: boolean;
   show_qa?: boolean;
   show_cta?: boolean;
+  store_name?: string;
 }
 
 export interface AppContextType {

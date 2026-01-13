@@ -112,6 +112,7 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
 export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const showOrderCta = chefProfile.show_order_button && !!chefProfile.order_link;
+  const showCtaBlock = chefProfile.show_cta !== false;
 
   React.useEffect(() => {
     trackEvent('page_view');
@@ -131,7 +132,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
             <Utensils size={24} />
           </div>
           <h1 className="text-gold text-lg md:text-xl font-bold leading-tight tracking-widest flex-1 text-center uppercase">
-            鑫蘴家
+            {chefProfile.store_name || '鑫蘴家'}
           </h1>
           <div className="flex w-10 md:w-32 items-center justify-end">
             <Link to="/admin" className="text-gold hover:text-white transition-colors">
@@ -227,26 +228,26 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
 
         {/* CTA Section */}
-        {chefProfile.show_cta !== false && (
+        {showCtaBlock && (
           <div className="px-4 py-8">
             <div className="bg-gold/5 rounded-2xl p-8 border border-gold/20 flex flex-col items-center text-center">
               <h4 className="text-xl font-bold mb-3 text-gold">{chefProfile.cta_title}</h4>
-              <p className="text-sm text-white/70">{chefProfile.cta_description}</p>
+              <p className="text-sm text-white/80">{chefProfile.cta_description}</p>
             </div>
+          </div>
+        )}
 
-            {chefProfile.show_order_button && chefProfile.order_link && (
-              <div className="px-2 pt-6">
-                <a
-                  href={chefProfile.order_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all uppercase tracking-widest flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart size={18} />
-                  立即訂購
-                </a>
-              </div>
-            )}
+        {showOrderCta && (
+          <div className={`px-2 ${showCtaBlock ? 'pt-0 md:pt-2' : 'py-8'} hidden md:block`}>
+            <a
+              href={chefProfile.order_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gold text-black font-black py-4 px-10 rounded-xl w-full shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all motion-reduce:transition-none uppercase tracking-widest flex items-center justify-center gap-2"
+            >
+              <ShoppingCart size={18} />
+              立即訂購
+            </a>
           </div>
         )}
 
@@ -281,7 +282,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
             )}
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">
-            © 2019 鑫蘴家
+            © 2019 {chefProfile.store_name || '鑫蘴家'}
           </p>
           <div className="mt-8 flex justify-center">
             <div className="w-32 h-1 bg-white/10 rounded-full"></div>

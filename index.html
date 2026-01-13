@@ -44,6 +44,37 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
+    .loading-flow {
+      color: rgba(255, 255, 255, 0.55);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.15));
+      background-size: 200% 100%;
+      animation: loading-flow 1.6s ease-in-out infinite;
+    }
+
+    @supports (-webkit-background-clip: text) or (background-clip: text) {
+      .loading-flow {
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .loading-flow {
+        animation: none;
+      }
+    }
+
+    @keyframes loading-flow {
+      0% {
+        background-position: 0% 50%;
+      }
+      100% {
+        background-position: 200% 50%;
+      }
+    }
+
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -72,7 +103,13 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="flex min-h-screen flex-col items-center justify-center bg-[#181411] text-white font-sans">
+      <div class="relative flex flex-col items-center">
+        <div class="loading-flow text-xl font-light tracking-[0.2em] uppercase">LOADING.....</div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/index.tsx"></script>
 </body>
 

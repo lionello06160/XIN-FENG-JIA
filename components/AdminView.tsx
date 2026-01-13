@@ -100,7 +100,7 @@ const AdminLayout = ({ children, title, backTo, leftAction, rightAction }: { chi
           <h2 className="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] truncate w-full">
             {title}
           </h2>
-          {title === "鑫蘴家 · 管理後台" && (
+          {title.includes("管理後台") && (
             <p className="text-[#8a7560] text-xs font-medium uppercase tracking-wider">主廚管理控制台</p>
           )}
         </div>
@@ -209,7 +209,7 @@ export const AdminDashboard = ({
 
   return (
     <AdminLayout
-      title="鑫蘴家 · 管理後台"
+      title={`${chefProfile.store_name || '鑫蘴家'} · 管理後台`}
       leftAction={
         <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-admin-primary" style={{ backgroundImage: `url("${chefProfile.image}")` }}></div>
       }
@@ -655,8 +655,18 @@ export const EditProfile = ({
           <div className="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
             <h4 className="text-[#181411] text-lg font-bold border-b border-gray-50 pb-4">基本資料</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <label className="flex flex-col w-full gap-2 md:col-span-2">
+                <p className="text-[#181411] text-sm font-bold px-1">店舖名稱 (顯示於首頁與登入頁)</p>
+                <input
+                  className="flex w-full rounded-xl border border-[#e6e0db] bg-white h-12 px-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none transition-all"
+                  value={formData.store_name || ''}
+                  onChange={e => setFormData({ ...formData, store_name: e.target.value })}
+                  placeholder="例如：鑫蘴家"
+                />
+              </label>
+
               <label className="flex flex-col w-full gap-2">
-                <p className="text-[#181411] text-sm font-bold px-1">正式姓名</p>
+                <p className="text-[#181411] text-sm font-bold px-1">廚師姓名</p>
                 <input
                   className="flex w-full rounded-xl border border-[#e6e0db] bg-white h-12 px-4 focus:border-admin-primary focus:ring-1 focus:ring-admin-primary outline-none transition-all"
                   value={formData.name || ''}
@@ -719,6 +729,27 @@ export const EditProfile = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gold/10 rounded-lg text-gold">
+                    <Sparkles size={20} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[#181411] text-sm font-bold">顯示首頁 CTA 區塊</span>
+                    <span className="text-gray-400 text-[10px]">標題與描述區塊</span>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={formData.show_cta ?? true}
+                    onChange={e => setFormData({ ...formData, show_cta: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold"></div>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-3">
                   <ShoppingBag className="text-admin-primary" size={20} />
                   <div className="flex flex-col">
                     <span className="text-[#181411] text-sm font-bold">顯示訂購按鈕</span>
@@ -731,25 +762,6 @@ export const EditProfile = ({
                     className="sr-only peer"
                     checked={formData.show_order_button || false}
                     onChange={e => setFormData({ ...formData, show_order_button: e.target.checked })}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
-                </label>
-              </div>
-
-              <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="text-admin-primary" size={20} />
-                  <div className="flex flex-col">
-                    <span className="text-[#181411] text-sm font-bold">顯示 CTA 區塊</span>
-                    <span className="text-gray-400 text-[10px]">首頁底部呼籲</span>
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={formData.show_cta !== false}
-                    onChange={e => setFormData({ ...formData, show_cta: e.target.checked })}
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-admin-primary"></div>
                 </label>

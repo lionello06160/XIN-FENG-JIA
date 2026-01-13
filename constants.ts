@@ -1,6 +1,7 @@
 import { ChefProfile, Dish } from './types';
 
 export const INITIAL_CHEF_PROFILE: ChefProfile = {
+  store_name: "",
   name: "Rolando",
   title: "Executive Chef / Creative Director",
   bio: "致力於將傳統烹飪技藝與現代創新融合，透過每一道佳餚演繹感官故事。擁有超過十五年的頂級餐飲經驗，專注於食材本味的極致發揮。",
@@ -15,6 +16,7 @@ export const INITIAL_CHEF_PROFILE: ChefProfile = {
   cta_description: "在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。",
   order_link: "",
   show_order_button: false,
+  show_cta: true,
   show_qa: false
 };
 
