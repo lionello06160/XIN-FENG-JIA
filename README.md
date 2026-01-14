@@ -62,10 +62,9 @@
 
 請在 Supabase Dashboard 的 **SQL Editor** 中依序執行以下腳本：
 
-1. **基礎架構**：執行 [`setup.sql`](./setup.sql) 以建立核心資料表與權限。
-2. **Q&A 功能**：執行 [`migration_qa.sql`](./migration_qa.sql) 啟用問答管理表。
-3. **評價功能**：執行 [`migrate_reviews.sql`](./migrate_reviews.sql) 建立評價表與審核欄位。
-4. **儲存空間**：在 Storage 中建立名為 `images` 的 **Public** Bucket。
+1. **整合版 (建議新環境使用)**：執行 [`schema.sql`](./schema.sql) 一次建立所有資料表與權限。
+2. **分步建立**：若已使用既有流程，依序執行 [`setup.sql`](./setup.sql)、[`migration_qa.sql`](./migration_qa.sql)、[`migrate_reviews.sql`](./migrate_reviews.sql)。
+3. **儲存空間**：在 Storage 中建立名為 `images` 的 **Public** Bucket。
 
 > [!IMPORTANT]
 > 預設管理員帳號：`rolando` / 密碼：`rolando` (建議登入後立即變更密碼)。
