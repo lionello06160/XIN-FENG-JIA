@@ -17,7 +17,8 @@ export const INITIAL_CHEF_PROFILE: ChefProfile = {
   order_link: "",
   show_order_button: false,
   show_cta: true,
-  show_qa: false
+  show_qa: false,
+  show_reviews: true
 };
 
 export const INITIAL_DISHES: Dish[] = [

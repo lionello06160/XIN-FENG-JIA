@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS dishes (
     image TEXT NOT NULL,
     available BOOLEAN DEFAULT true,
     sold_out BOOLEAN DEFAULT false,
+    show_reviews BOOLEAN DEFAULT true,
     order_index INTEGER DEFAULT 0
 );
 
@@ -29,7 +30,8 @@ CREATE TABLE IF NOT EXISTS chef_profile (
     cta_description TEXT DEFAULT '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
     show_cta BOOLEAN DEFAULT true,
     order_link TEXT DEFAULT '',
-    show_order_button BOOLEAN DEFAULT false
+    show_order_button BOOLEAN DEFAULT false,
+    show_reviews BOOLEAN DEFAULT true
 );
 
 -- 3. 開啟 Row Level Security (RLS)
@@ -73,6 +75,34 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public select on admin_auth') THEN
         CREATE POLICY "Allow public select on admin_auth" ON admin_auth FOR SELECT USING (true);
+    END IF;
+END $$;
+
+-- 7. 創建 dish_reviews 表
+CREATE TABLE IF NOT EXISTS dish_reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    dish_id UUID REFERENCES dishes(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    status TEXT DEFAULT 'pending',
+    published_at TIMESTAMPTZ,
+    reply_text TEXT,
+    replied_at TIMESTAMPTZ,
+    is_deleted BOOLEAN DEFAULT false,
+    deleted_at TIMESTAMPTZ
+);
+
+ALTER TABLE dish_reviews ENABLE ROW LEVEL SECURITY;
+
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on dish_reviews' AND tablename = 'dish_reviews') THEN
+        CREATE POLICY "Allow public read-only access on dish_reviews" ON dish_reviews FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on dish_reviews for developing' AND tablename = 'dish_reviews') THEN
+        CREATE POLICY "Allow all actions on dish_reviews for developing" ON dish_reviews FOR ALL USING (true);
     END IF;
 END $$;
 

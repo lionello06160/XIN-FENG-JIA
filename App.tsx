@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClientView } from './components/ClientView';
-import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard, QAManager, EditQAItem, ChangePassword } from './components/AdminView';
+import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard, QAManager, EditQAItem, ChangePassword, ReviewsManager } from './components/AdminView';
 import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
-import { ChefProfile, Dish, QAItem } from './types';
+import { ChefProfile, Dish, QAItem, DishReview } from './types';
 import { supabase } from './lib/supabase';
 import { LoginView } from './components/LoginView';
 import { Analytics } from "@vercel/analytics/react"
@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [chefProfile, setChefProfile] = useState<ChefProfile>(INITIAL_CHEF_PROFILE);
   const [dishes, setDishes] = useState<Dish[]>(INITIAL_DISHES);
   const [qaItems, setQaItems] = useState<QAItem[]>([]);
+  const [dishReviews, setDishReviews] = useState<DishReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -65,6 +66,7 @@ const App: React.FC = () => {
           show_order_button: !!profileData.show_order_button,
           show_qa: !!profileData.show_qa,
           show_cta: profileData.show_cta !== false,
+          show_reviews: profileData.show_reviews !== false,
           store_name: profileData.store_name ?? ''
         });
       }
@@ -90,7 +92,23 @@ const App: React.FC = () => {
       if (dishesError) {
         console.error('Error fetching dishes:', dishesError);
       } else if (dishesData) {
-        setDishes(dishesData as Dish[]);
+        const normalizedDishes = (dishesData as Dish[]).map((dish) => ({
+          ...dish,
+          show_reviews: dish.show_reviews !== false
+        }));
+        setDishes(normalizedDishes);
+      }
+
+      // Fetch Dish Reviews
+      const { data: reviewsData, error: reviewsError } = await supabase
+        .from('dish_reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (reviewsError) {
+        console.error('Error fetching reviews:', reviewsError);
+      } else if (reviewsData) {
+        setDishReviews(reviewsData as DishReview[]);
       }
     } catch (err) {
       console.error('Data loading error:', err);
@@ -184,6 +202,7 @@ const App: React.FC = () => {
       show_order_button: updatedProfile.show_order_button,
       show_qa: updatedProfile.show_qa,
       show_cta: updatedProfile.show_cta,
+      show_reviews: updatedProfile.show_reviews,
       store_name: updatedProfile.store_name
     };
 
@@ -260,6 +279,84 @@ const App: React.FC = () => {
     }
   };
 
+  const handleAddReview = async (
+    dishId: string,
+    payload: { name: string; rating: number; comment: string }
+  ) => {
+    const { data, error } = await supabase
+      .from('dish_reviews')
+      .insert([
+        {
+          dish_id: dishId,
+          name: payload.name,
+          rating: payload.rating,
+          comment: payload.comment,
+          status: 'pending'
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding review:', error);
+      throw error;
+    }
+    if (data) {
+      setDishReviews(prev => [data as DishReview, ...prev]);
+    }
+  };
+
+  const handleReplyReview = async (reviewId: string, replyText: string) => {
+    const { data, error } = await supabase
+      .from('dish_reviews')
+      .update({ reply_text: replyText, replied_at: new Date().toISOString() })
+      .eq('id', reviewId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error replying review:', error);
+      throw error;
+    }
+    if (data) {
+      setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...(review as DishReview), ...data } : review));
+    }
+  };
+
+  const handleUpdateReviewStatus = async (reviewId: string, status: 'pending' | 'published') => {
+    const updates = status === 'published'
+      ? { status, published_at: new Date().toISOString() }
+      : { status, published_at: null };
+
+    const { data, error } = await supabase
+      .from('dish_reviews')
+      .update(updates)
+      .eq('id', reviewId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating review status:', error);
+      throw error;
+    }
+    if (data) {
+      setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...(review as DishReview), ...data } : review));
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    const { error } = await supabase
+      .from('dish_reviews')
+      .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+      .eq('id', reviewId);
+
+    if (error) {
+      console.error('Error deleting review:', error);
+      throw error;
+    }
+    setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...review, is_deleted: true, deleted_at: new Date().toISOString() } : review));
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-sans">
@@ -280,7 +377,18 @@ const App: React.FC = () => {
       <Analytics />
       <Routes>
         {/* Client Side Routes */}
-        <Route path="/" element={<ClientView chefProfile={chefProfile} dishes={dishes} qaItems={qaItems} />} />
+        <Route
+          path="/"
+          element={
+            <ClientView
+              chefProfile={chefProfile}
+              dishes={dishes}
+              qaItems={qaItems}
+              reviews={dishReviews}
+              onAddReview={handleAddReview}
+            />
+          }
+        />
 
         {/* Admin Routes */}
         <Route
@@ -328,6 +436,22 @@ const App: React.FC = () => {
           element={
             isAuthenticated ? (
               <QAManager qaItems={qaItems} onDeleteQA={handleDeleteQA} onReorderQA={handleReorderQA} />
+            ) : (
+              <Navigate to="/admin" replace />
+            )
+          }
+        />
+        <Route
+          path="/admin/reviews"
+          element={
+            isAuthenticated ? (
+              <ReviewsManager
+                reviews={dishReviews}
+                dishes={dishes}
+                onReplyReview={handleReplyReview}
+                onUpdateReviewStatus={handleUpdateReviewStatus}
+                onDeleteReview={handleDeleteReview}
+              />
             ) : (
               <Navigate to="/admin" replace />
             )

@@ -12,6 +12,7 @@ export interface Dish {
   order_index?: number;
   spiciness?: number;
   is_new?: boolean;
+  show_reviews?: boolean;
 }
 
 export interface QAItem {
@@ -20,6 +21,21 @@ export interface QAItem {
   question: string;
   answer: string;
   order_index: number;
+}
+
+export interface DishReview {
+  id: string;
+  dish_id: string;
+  name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  reply_text?: string;
+  replied_at?: string;
+  is_deleted?: boolean;
+  deleted_at?: string;
+  status?: 'pending' | 'published';
+  published_at?: string;
 }
 
 export interface ChefProfile {
@@ -39,6 +55,7 @@ export interface ChefProfile {
   show_order_button?: boolean;
   show_qa?: boolean;
   show_cta?: boolean;
+  show_reviews?: boolean;
   store_name?: string;
 }
 

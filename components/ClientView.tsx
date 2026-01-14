@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { ChefProfile, Dish, QAItem } from '../types';
+import { ChefProfile, Dish, QAItem, DishReview } from '../types';
 import { QASection } from './QASection';
-import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles } from 'lucide-react';
+import { StarRating } from './StarRating';
+import { formatRelativeTime, getRatingStats } from '../lib/reviews';
+import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../lib/supabase';
 
@@ -9,10 +11,97 @@ interface ClientViewProps {
   chefProfile: ChefProfile;
   dishes: Dish[];
   qaItems: QAItem[];
+  reviews: DishReview[];
+  onAddReview: (dishId: string, review: { name: string; rating: number; comment: string }) => Promise<void>;
 }
 
-const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
+const ratingLabels: Record<number, string> = {
+  1: '需要改進',
+  2: '尚可',
+  3: '不錯',
+  4: '很滿意',
+  5: '極致滿意'
+};
+
+const DishModal = ({
+  dish,
+  reviews,
+  showReviews,
+  onAddReview,
+  onClose
+}: {
+  dish: Dish;
+  reviews: DishReview[];
+  showReviews: boolean;
+  onAddReview: (dishId: string, review: { name: string; rating: number; comment: string }) => Promise<void>;
+  onClose: () => void;
+}) => {
   if (!dish) return null;
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewerName, setReviewerName] = useState('');
+  const [comment, setComment] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  React.useEffect(() => {
+    setRating(0);
+    setHoverRating(0);
+    setReviewerName('');
+    setComment('');
+    setSubmitted(false);
+    setSubmitError('');
+    setIsSubmitting(false);
+    setVisibleCount(3);
+    setIsLoadingMore(false);
+  }, [dish.id]);
+
+  const ratingStats = getRatingStats(reviews);
+  const averageDisplay = ratingStats.count ? ratingStats.average.toFixed(1) : '—';
+  const ratingLabel = ratingLabels[hoverRating || rating] || '點選星等';
+  const canSubmit = rating > 0 && reviewerName.trim().length >= 2 && comment.trim().length >= 6;
+  const maxRatingCount = Math.max(1, ...ratingStats.ratingCounts);
+  const latestReviews = [...reviews]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const visibleReviews = latestReviews.slice(0, visibleCount);
+  const hasMoreReviews = visibleCount < latestReviews.length;
+
+  const handleLoadMore = () => {
+    if (!hasMoreReviews || isLoadingMore) return;
+    setIsLoadingMore(true);
+    window.setTimeout(() => {
+      setVisibleCount((prev) => Math.min(prev + 3, latestReviews.length));
+      setIsLoadingMore(false);
+    }, 350);
+  };
+
+  const handleSubmitReview = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!canSubmit) return;
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      await onAddReview(dish.id, {
+        name: reviewerName.trim(),
+        rating,
+        comment: comment.trim()
+      });
+      setSubmitted(true);
+      setReviewerName('');
+      setComment('');
+      setRating(0);
+      setHoverRating(0);
+      window.setTimeout(() => setSubmitted(false), 1600);
+    } catch (error) {
+      setSubmitError('送出失敗，請稍後再試');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -102,6 +191,167 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
                 ))}
               </ul>
             </section>
+
+            {showReviews && (
+              <section>
+                <h3 className="text-[#181411] font-bold text-lg mb-3 flex items-center gap-2">
+                  <Star className="text-gold" size={20} />
+                  食客評價
+                </h3>
+
+                <div className="bg-admin-bg border border-gray-100 rounded-xl p-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] gap-4 items-center">
+                    <div>
+                      <div className="text-3xl font-bold text-[#181411]">{averageDisplay}</div>
+                      <StarRating rating={ratingStats.average} size={16} />
+                      <div className="text-xs text-gray-500 mt-1">
+                        {ratingStats.count ? `${ratingStats.count} 則評價` : '尚無評價'}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {[5, 4, 3, 2, 1].map((star) => {
+                        const count = ratingStats.ratingCounts[star - 1] || 0;
+                        const width = (count / maxRatingCount) * 100;
+                        return (
+                          <div key={star} className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-gray-500 w-10">{star} 星</span>
+                            <div className="flex-1 h-2 bg-white rounded-full border border-gray-100 overflow-hidden">
+                              <div
+                                className="h-full bg-gold/70 transition-all duration-500 motion-reduce:transition-none"
+                                style={{ width: `${width}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs text-gray-400 w-6 text-right">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <form className="mt-4 space-y-4" onSubmit={handleSubmitReview}>
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold text-[#181411]">評分</div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1" role="radiogroup" aria-label="評分">
+                        {[1, 2, 3, 4, 5].map((value) => {
+                          const activeRating = hoverRating || rating;
+                          const isActive = value <= activeRating;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              role="radio"
+                              aria-checked={rating === value}
+                              className="p-1 rounded-md transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50"
+                              onMouseEnter={() => setHoverRating(value)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onFocus={() => setHoverRating(value)}
+                              onBlur={() => setHoverRating(0)}
+                              onClick={() => setRating(value)}
+                            >
+                              <Star size={20} className={isActive ? 'text-gold' : 'text-gold/30'} fill={isActive ? 'currentColor' : 'none'} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <span className="text-xs text-gray-500">{ratingLabel}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <label className="flex flex-col gap-2">
+                      <span className="text-sm font-semibold text-[#181411]">姓名</span>
+                      <input
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-gray-400 outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
+                        placeholder="請輸入姓名"
+                        value={reviewerName}
+                        onChange={(event) => setReviewerName(event.target.value)}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2 md:col-span-2">
+                      <span className="text-sm font-semibold text-[#181411]">評語</span>
+                      <textarea
+                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-gray-400 outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 min-h-[120px] resize-none"
+                        placeholder="分享您對這道料理的感受"
+                        value={comment}
+                        onChange={(event) => setComment(event.target.value)}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <span className="text-xs text-gray-500">請填寫 2 字以上姓名與 6 字以上評語</span>
+                    <div className="flex items-center gap-3">
+                      {submitError && (
+                        <span className="text-xs text-red-500 font-semibold">{submitError}</span>
+                      )}
+                      {submitted && !submitError && (
+                        <span className="text-xs text-green-600 font-semibold">已送出，待審核後顯示</span>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={!canSubmit || isSubmitting}
+                        className="px-5 py-2 rounded-lg bg-gold text-black text-sm font-bold shadow-sm shadow-gold/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all motion-reduce:transition-none"
+                      >
+                        {isSubmitting ? '送出中...' : '送出評價'}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <div className="mt-6 space-y-3">
+                  <div className="text-sm font-semibold text-[#181411]">最新評價</div>
+                  {latestReviews.length ? (
+                    <>
+                      <div className="text-[11px] text-gray-400">
+                        已顯示 {Math.min(visibleReviews.length, latestReviews.length)} / {latestReviews.length}
+                      </div>
+                      {visibleReviews.map((review) => (
+                      <div key={review.id} className="bg-admin-bg border border-gray-100 rounded-xl p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <StarRating rating={review.rating} size={14} />
+                            <span className="text-sm font-semibold text-[#181411]">{review.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs text-gray-400">
+                            <Clock size={14} />
+                            <span>{formatRelativeTime(review.created_at)}</span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2 leading-relaxed">{review.comment}</p>
+                        {review.reply_text && (
+                          <div className="mt-3 border-l-2 border-gold/30 pl-3">
+                            <div className="text-xs font-semibold text-gold">主廚回覆</div>
+                            <p className="text-xs text-gray-600 mt-1 leading-relaxed">{review.reply_text}</p>
+                            {review.replied_at && (
+                              <div className="text-[10px] text-gray-400 mt-1">
+                                {formatRelativeTime(review.replied_at)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      ))}
+                      {hasMoreReviews && (
+                        <div className="flex justify-center pt-2">
+                          <button
+                            type="button"
+                            onClick={handleLoadMore}
+                            disabled={isLoadingMore}
+                            className="px-4 py-2 text-xs font-bold text-gold bg-gold/10 rounded-full border border-gold/30 hover:bg-gold hover:text-black transition-all disabled:opacity-50"
+                          >
+                            {isLoadingMore ? '載入中...' : '載入更多'}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-sm text-gray-400">成為第一位評論的人</div>
+                  )}
+                </div>
+              </section>
+            )}
           </div>
         </div>
       </div>
@@ -109,10 +359,11 @@ const DishModal = ({ dish, onClose }: { dish: Dish; onClose: () => void }) => {
   );
 };
 
-export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems }) => {
+export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems, reviews, onAddReview }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const showOrderCta = chefProfile.show_order_button && !!chefProfile.order_link;
   const showCtaBlock = chefProfile.show_cta !== false;
+  const showReviews = chefProfile.show_reviews !== false;
 
   React.useEffect(() => {
     trackEvent('page_view');
@@ -122,6 +373,19 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
     setSelectedDish(dish);
     trackEvent('dish_click', dish.id);
   };
+
+  const reviewsByDish = React.useMemo(() => {
+    const grouped: Record<string, DishReview[]> = {};
+    reviews.forEach((review) => {
+      if (review.is_deleted) return;
+      if (review.status !== 'published') return;
+      if (!grouped[review.dish_id]) grouped[review.dish_id] = [];
+      grouped[review.dish_id].push(review);
+    });
+    return grouped;
+  }, [reviews]);
+
+  const getReviewsForDish = (dishId: string) => reviewsByDish[dishId] || [];
 
   return (
     <div className="min-h-screen bg-luxury-dark text-white font-sans selection:bg-gold selection:text-black">
@@ -177,7 +441,11 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
 
         {/* Menu Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 py-4">
-          {dishes.map((dish) => (
+          {dishes.map((dish) => {
+            const reviews = getReviewsForDish(dish.id);
+            const ratingStats = getRatingStats(reviews);
+            const showDishReviews = showReviews && dish.show_reviews !== false;
+            return (
             <div key={dish.id} className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group">
               <div
                 className="bg-cover bg-center aspect-[16/9] transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none relative"
@@ -210,6 +478,19 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
                         </div>
                       )}
                     </div>
+                    {showDishReviews && (
+                      <div className="mt-1">
+                        {ratingStats.count ? (
+                          <div className="flex items-center gap-2 text-xs text-white/80">
+                            <StarRating rating={ratingStats.average} size={14} />
+                            <span className="font-semibold text-white">{ratingStats.average.toFixed(1)}</span>
+                            <span className="text-white/50">({ratingStats.count})</span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-white/40">尚無評價</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">價格</span>
@@ -224,7 +505,8 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* CTA Section */}
@@ -309,7 +591,13 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
       {/* Modal Overlay */}
       {
         selectedDish && (
-          <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} />
+          <DishModal
+            dish={selectedDish}
+            reviews={getReviewsForDish(selectedDish.id)}
+            showReviews={showReviews && selectedDish.show_reviews !== false}
+            onAddReview={onAddReview}
+            onClose={() => setSelectedDish(null)}
+          />
         )
       }
     </div >
