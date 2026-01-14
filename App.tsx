@@ -100,18 +100,10 @@ const App: React.FC = () => {
       }
 
       // Fetch Dish Reviews
-      let reviewsQuery = supabase
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('dish_reviews')
         .select('*')
         .order('created_at', { ascending: false });
-
-      if (!isAuthenticated) {
-        reviewsQuery = reviewsQuery
-          .eq('status', 'published')
-          .eq('is_deleted', false);
-      }
-
-      const { data: reviewsData, error: reviewsError } = await reviewsQuery;
 
       if (reviewsError) {
         console.error('Error fetching reviews:', reviewsError);
@@ -127,7 +119,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isAuthenticated]);
+  }, []);
 
   // Actions
   const handleUpdateDish = async (id: string, updatedData: Partial<Dish>) => {

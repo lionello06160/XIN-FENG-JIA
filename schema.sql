@@ -113,16 +113,10 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on dish_reviews' AND tablename = 'dish_reviews') THEN
-        CREATE POLICY "Allow public read-only access on dish_reviews" ON dish_reviews FOR SELECT USING (status = 'published' AND is_deleted = false);
+        CREATE POLICY "Allow public read-only access on dish_reviews" ON dish_reviews FOR SELECT USING (true);
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow insert on dish_reviews' AND tablename = 'dish_reviews') THEN
-        CREATE POLICY "Allow insert on dish_reviews" ON dish_reviews FOR INSERT WITH CHECK (true);
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow update on dish_reviews for developing' AND tablename = 'dish_reviews') THEN
-        CREATE POLICY "Allow update on dish_reviews for developing" ON dish_reviews FOR UPDATE USING (true);
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow delete on dish_reviews for developing' AND tablename = 'dish_reviews') THEN
-        CREATE POLICY "Allow delete on dish_reviews for developing" ON dish_reviews FOR DELETE USING (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on dish_reviews for developing' AND tablename = 'dish_reviews') THEN
+        CREATE POLICY "Allow all actions on dish_reviews for developing" ON dish_reviews FOR ALL USING (true);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow anonymous insert' AND tablename = 'analytics_events') THEN
