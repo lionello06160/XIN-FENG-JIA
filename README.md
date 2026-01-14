@@ -42,7 +42,7 @@
 1. **複製與安裝**：
    ```bash
    git clone [repository-url]
-   cd julian-vane-gastronomy
+   cd XIN-FENG-JIA
    npm install
    ```
 
