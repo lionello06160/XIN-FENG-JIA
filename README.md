@@ -60,11 +60,10 @@
 
 ### 🗄️ 資料庫初始化 (Supabase)
 
-請在 Supabase Dashboard 的 **SQL Editor** 中依序執行以下腳本：
+請在 Supabase Dashboard 的 **SQL Editor** 中執行以下腳本：
 
-1. **整合版 (建議新環境使用)**：執行 [`schema.sql`](./schema.sql) 一次建立所有資料表與權限。
-2. **分步建立**：若已使用既有流程，依序執行 [`setup.sql`](./setup.sql)、[`migration_qa.sql`](./migration_qa.sql)、[`migrate_reviews.sql`](./migrate_reviews.sql)。
-3. **儲存空間**：在 Storage 中建立名為 `images` 的 **Public** Bucket。
+1. **整合版**：執行 [`schema.sql`](./schema.sql) 一次建立所有資料表與權限。
+2. **儲存空間**：在 Storage 中建立名為 `images` 的 **Public** Bucket。
 
 > [!IMPORTANT]
 > 預設管理員帳號：`rolando` / 密碼：`rolando` (建議登入後立即變更密碼)。
