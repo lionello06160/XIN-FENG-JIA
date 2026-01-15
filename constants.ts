@@ -30,7 +30,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "義大利進口黑松露搭配陳年帕馬森起司，濃郁香氣在口中綻放。",
     inspiration: "靈感來自義大利北部秋季的松露狩獵之旅，試圖重現森林清晨的氣息。",
     ingredients: ["義大利米", "黑松露", "帕馬森起司", "雞高湯"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "2",
@@ -41,7 +42,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "北海道生食級干貝，經過高溫精準香煎至外層金黃酥脆，內部仍保有如絲綢般的鮮甜口感。",
     inspiration: "這道料理源於對海洋鮮味的致敬。搭配主廚特調的豌豆泥，將大地與海洋的奢華風味完美融合。",
     ingredients: ["北海道干貝", "青豆泥", "檸檬泡沫", "微型香草"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "3",
@@ -52,7 +54,8 @@ export const INITIAL_DISHES: Dish[] = [
     inspiration: "極致奢華的前菜體驗，旨在喚醒味蕾。",
     ingredients: ["A5和牛", "魚子醬", "金箔", "特製醬汁"],
     available: true,
-    soldOut: true
+    soldOut: true,
+    is_visible: true
   },
   {
     id: "4",
@@ -62,7 +65,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "手工塔皮搭配日本高知縣柚子卡士達，酸甜平衡。",
     inspiration: "清新解膩的完美句點。",
     ingredients: ["柚子原汁", "法國奶油", "杏仁粉", "蛋白霜"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "5",
@@ -72,7 +76,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "綜合野菇慢火熬製，加入松露油提香。",
     inspiration: "暖心暖胃的經典湯品。",
     ingredients: ["牛肝菌", "香菇", "鮮奶油", "松露油"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "6",
@@ -82,7 +87,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "海鱸魚菲力，搭配時令蔬菜與白酒奶油醬。",
     inspiration: "傳統法式魚料理的現代演繹。",
     ingredients: ["海鱸魚", "蘆筍", "白酒", "奶油"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "7",
@@ -92,7 +98,8 @@ export const INITIAL_DISHES: Dish[] = [
     description: "整隻波士頓龍蝦，焗烤至金黃，鮮甜彈牙。",
     inspiration: "慶祝時刻的必備佳餚。",
     ingredients: ["波士頓龍蝦", "起司", "白醬", "香草"],
-    available: true
+    available: true,
+    is_visible: true
   },
   {
     id: "8",
@@ -102,6 +109,7 @@ export const INITIAL_DISHES: Dish[] = [
     description: "70% 苦甜巧克力製作，切開後流出濃郁巧克力漿。",
     inspiration: "甜點主廚的招牌之作。",
     ingredients: ["苦甜巧克力", "奶油", "雞蛋", "麵粉"],
-    available: true
+    available: true,
+    is_visible: true
   }
 ];

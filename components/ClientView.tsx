@@ -459,77 +459,79 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
 
         {/* Menu Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 py-4">
-          {dishes.map((dish, index) => {
-            const reviews = getReviewsForDish(dish.id);
-            const ratingStats = getRatingStats(reviews);
-            const showDishReviews = showReviews && dish.show_reviews !== false;
-            return (
-              <div
-                key={dish.id}
-                className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group animate-fade-in-up"
-                style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
-              >
-                <div className="relative aspect-[16/9] overflow-hidden">
-                  <img
-                    src={dish.image}
-                    alt={`菜色圖片：${dish.name}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none"
-                  />
-                  {dish.is_new && (
-                    <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-fade-in motion-reduce:animate-none">
-                      <span className="text-xs font-bold text-white drop-shadow-md tracking-wider">✨ 新品上市</span>
-                    </div>
-                  )}
-                  {!dish.available && (
-                    <div className="absolute top-3 right-3 bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full border-2 border-gold/70 shadow-lg">
-                      已售罄
-                    </div>
-                  )}
-                </div>
-                <div className="p-4 flex flex-col gap-3 relative bg-luxury-card">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">名稱</span>
-                      <div className="flex items-center gap-2">
-                        <p className="text-white text-lg font-bold leading-tight">{dish.name}</p>
-                        {!!dish.spiciness && dish.spiciness > 0 && (
-                          <div className="flex gap-0.5">
-                            {Array.from({ length: dish.spiciness }).map((_, i) => (
-                              <span key={i} className="text-sm">🌶️</span>
-                            ))}
+          {dishes
+            .filter(d => d.is_visible !== false)
+            .map((dish, index) => {
+              const reviews = getReviewsForDish(dish.id);
+              const ratingStats = getRatingStats(reviews);
+              const showDishReviews = showReviews && dish.show_reviews !== false;
+              return (
+                <div
+                  key={dish.id}
+                  className="flex flex-col bg-luxury-card rounded-2xl overflow-hidden border border-white/5 shadow-lg group animate-fade-in-up"
+                  style={{ animationDelay: `${index * 150}ms`, animationFillMode: 'both' }}
+                >
+                  <div className="relative aspect-[16/9] overflow-hidden">
+                    <img
+                      src={dish.image}
+                      alt={`菜色圖片：${dish.name}`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none"
+                    />
+                    {dish.is_new && (
+                      <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-fade-in motion-reduce:animate-none">
+                        <span className="text-xs font-bold text-white drop-shadow-md tracking-wider">✨ 新品上市</span>
+                      </div>
+                    )}
+                    {!dish.available && (
+                      <div className="absolute top-3 right-3 bg-red-600/90 text-white text-xs font-bold px-3 py-1.5 rounded-full border-2 border-gold/70 shadow-lg">
+                        已售罄
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 flex flex-col gap-3 relative bg-luxury-card">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">名稱</span>
+                        <div className="flex items-center gap-2">
+                          <p className="text-white text-lg font-bold leading-tight">{dish.name}</p>
+                          {!!dish.spiciness && dish.spiciness > 0 && (
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: dish.spiciness }).map((_, i) => (
+                                <span key={i} className="text-sm">🌶️</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {showDishReviews && (
+                          <div className="mt-1">
+                            {ratingStats.count ? (
+                              <div className="flex items-center gap-2 text-xs text-white/80">
+                                <StarRating rating={ratingStats.average} size={14} />
+                                <span className="font-semibold text-white">{ratingStats.average.toFixed(1)}</span>
+                                <span className="text-white/50">({ratingStats.count})</span>
+                              </div>
+                            ) : (
+                              <span className="text-[10px] text-white/40">尚無評價</span>
+                            )}
                           </div>
                         )}
                       </div>
-                      {showDishReviews && (
-                        <div className="mt-1">
-                          {ratingStats.count ? (
-                            <div className="flex items-center gap-2 text-xs text-white/80">
-                              <StarRating rating={ratingStats.average} size={14} />
-                              <span className="font-semibold text-white">{ratingStats.average.toFixed(1)}</span>
-                              <span className="text-white/50">({ratingStats.count})</span>
-                            </div>
-                          ) : (
-                            <span className="text-[10px] text-white/40">尚無評價</span>
-                          )}
-                        </div>
-                      )}
+                      <div className="text-right">
+                        <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">價格</span>
+                        <p className="text-gold font-bold text-lg">NT$ {dish.price.toLocaleString()}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <span className="text-[10px] text-gold font-bold tracking-widest uppercase mb-1 block">價格</span>
-                      <p className="text-gold font-bold text-lg">NT$ {dish.price.toLocaleString()}</p>
-                    </div>
+                    <button
+                      onClick={() => handleDishClick(dish)}
+                      className="w-full py-3 bg-gold/10 border border-gold/30 text-gold rounded-xl text-sm font-bold active:bg-gold active:text-black hover:bg-gold hover:text-black transition-all motion-reduce:transition-none"
+                    >
+                      查看詳情
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleDishClick(dish)}
-                    className="w-full py-3 bg-gold/10 border border-gold/30 text-gold rounded-xl text-sm font-bold active:bg-gold active:text-black hover:bg-gold hover:text-black transition-all motion-reduce:transition-none"
-                  >
-                    查看詳情
-                  </button>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         {/* CTA Section */}

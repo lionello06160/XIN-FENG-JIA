@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem, DishReview } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Clock, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical, Home, MessageSquareText, Star
+  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Clock, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical, Home, MessageSquareText, Star, Eye
 } from 'lucide-react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -370,7 +370,8 @@ export const EditDish = ({
       available: true,
       image: 'https://picsum.photos/800/600', // Placeholder
       inspiration: '',
-      show_reviews: true
+      show_reviews: true,
+      is_visible: true
     }
   );
   const [uploading, setUploading] = useState(false);
@@ -548,6 +549,27 @@ export const EditDish = ({
                       onChange={e => setFormData({ ...formData, is_new: e.target.checked })}
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg text-blue-600">
+                      <Eye size={18} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[#181411] font-medium">於首頁可見</span>
+                      <span className="text-gray-400 text-[10px]">控制此前台是否顯示</span>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={formData.is_visible ?? true}
+                      onChange={e => setFormData({ ...formData, is_visible: e.target.checked })}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
 

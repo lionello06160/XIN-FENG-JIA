@@ -13,6 +13,7 @@ export interface Dish {
   spiciness?: number;
   is_new?: boolean;
   show_reviews?: boolean;
+  is_visible?: boolean;
 }
 
 export interface QAItem {
