@@ -120,6 +120,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow modify reviews' AND tablename = 'dish_reviews') THEN
         CREATE POLICY "Allow modify reviews" ON dish_reviews FOR ALL USING (id IS NOT NULL) WITH CHECK (rating >= 1 AND rating <= 5 AND length(comment) > 0);
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow anonymous insert reviews' AND tablename = 'dish_reviews') THEN
+        CREATE POLICY "Allow anonymous insert reviews" ON dish_reviews FOR INSERT TO anon WITH CHECK (rating >= 1 AND rating <= 5 AND length(comment) > 0);
+    END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow anonymous insert' AND tablename = 'analytics_events') THEN
         CREATE POLICY "Allow anonymous insert" ON analytics_events FOR INSERT TO anon WITH CHECK (event_type IN ('page_view', 'dish_click'));
