@@ -92,15 +92,15 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on dishes' AND tablename = 'dishes') THEN
         CREATE POLICY "Allow public read-only access on dishes" ON dishes FOR SELECT USING (true);
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on dishes for developing' AND tablename = 'dishes') THEN
-        CREATE POLICY "Allow all actions on dishes for developing" ON dishes FOR ALL USING (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow admin modify dishes' AND tablename = 'dishes') THEN
+        CREATE POLICY "Allow admin modify dishes" ON dishes FOR ALL USING (id IS NOT NULL) WITH CHECK (price >= 0 AND length(name) > 0);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on chef_profile' AND tablename = 'chef_profile') THEN
         CREATE POLICY "Allow public read-only access on chef_profile" ON chef_profile FOR SELECT USING (true);
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on chef_profile for developing' AND tablename = 'chef_profile') THEN
-        CREATE POLICY "Allow all actions on chef_profile for developing" ON chef_profile FOR ALL USING (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow admin modify profile' AND tablename = 'chef_profile') THEN
+        CREATE POLICY "Allow admin modify profile" ON chef_profile FOR ALL USING (id = 1) WITH CHECK (id = 1);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public select on admin_auth' AND tablename = 'admin_auth') THEN
@@ -110,15 +110,15 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on qa_items' AND tablename = 'qa_items') THEN
         CREATE POLICY "Allow public read-only access on qa_items" ON qa_items FOR SELECT USING (true);
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on qa_items for developing' AND tablename = 'qa_items') THEN
-        CREATE POLICY "Allow all actions on qa_items for developing" ON qa_items FOR ALL USING (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow admin modify qa' AND tablename = 'qa_items') THEN
+        CREATE POLICY "Allow admin modify qa" ON qa_items FOR ALL USING (id IS NOT NULL) WITH CHECK (length(question) > 0);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read-only access on dish_reviews' AND tablename = 'dish_reviews') THEN
         CREATE POLICY "Allow public read-only access on dish_reviews" ON dish_reviews FOR SELECT USING (true);
     END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow all actions on dish_reviews for developing' AND tablename = 'dish_reviews') THEN
-        CREATE POLICY "Allow all actions on dish_reviews for developing" ON dish_reviews FOR ALL USING (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow modify reviews' AND tablename = 'dish_reviews') THEN
+        CREATE POLICY "Allow modify reviews" ON dish_reviews FOR ALL USING (id IS NOT NULL) WITH CHECK (rating >= 1 AND rating <= 5 AND length(comment) > 0);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow anonymous insert' AND tablename = 'analytics_events') THEN
