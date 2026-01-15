@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS dishes (
     sold_out BOOLEAN DEFAULT false,
     spiciness INTEGER DEFAULT 0,
     is_new BOOLEAN DEFAULT false,
+    is_new BOOLEAN DEFAULT false,
     show_reviews BOOLEAN DEFAULT true,
+    is_visible BOOLEAN DEFAULT true,
     order_index INTEGER DEFAULT 0
 );
 
@@ -120,7 +122,7 @@ BEGIN
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow anonymous insert' AND tablename = 'analytics_events') THEN
-        CREATE POLICY "Allow anonymous insert" ON analytics_events FOR INSERT WITH CHECK (true);
+        CREATE POLICY "Allow anonymous insert" ON analytics_events FOR INSERT TO anon WITH CHECK (event_type IN ('page_view', 'dish_click'));
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow admin select' AND tablename = 'analytics_events') THEN
         CREATE POLICY "Allow admin select" ON analytics_events FOR SELECT USING (true);
