@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChefProfile, Dish, QAItem, DishReview } from '../types';
 import {
   ChevronLeft, ChevronUp, ChevronDown, Search, PlusCircle, UserCog, Edit, Trash,
-  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Clock, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical, Home, MessageSquareText, Star, Eye
+  Info, Utensils, BarChart, BarChart3, User, Settings, Camera, Save, Facebook, Instagram, Link as LinkIcon, Loader2, MessageCircle, ShoppingBag, ArrowLeft, Calendar, Clock, Mail, Sparkles, HelpCircle, ChevronRight, Lock, KeyRound, ShieldCheck, CheckCircle2, GripVertical, Home, MessageSquareText, Star, Eye, EyeOff
 } from 'lucide-react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { uploadImage, supabase } from '../lib/supabase';
@@ -304,6 +304,18 @@ export const AdminDashboard = ({
                               NEW
                             </span>
                           )}
+                          {/* Visibility Indicator */}
+                          {(dish.is_visible !== false) ? (
+                            <div className="flex items-center gap-1 ml-auto bg-blue-50 px-1.5 py-0.5 rounded-full border border-blue-100" title="首頁可見">
+                              <Eye size={10} className="text-blue-500" />
+                              <span className="text-[10px] font-bold text-blue-600">可見</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1 ml-auto bg-gray-100 px-1.5 py-0.5 rounded-full border border-gray-200" title="首頁已隱藏">
+                              <EyeOff size={10} className="text-gray-400" />
+                              <span className="text-[10px] font-bold text-gray-500">隱藏</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -339,7 +351,7 @@ export const AdminDashboard = ({
         <Info size={20} />
         <p className="text-xs font-medium">您可以自由新增更多菜色。</p>
       </div>
-    </AdminLayout>
+    </AdminLayout >
   );
 };
 
