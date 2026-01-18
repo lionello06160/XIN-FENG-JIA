@@ -394,7 +394,7 @@ export const EditDish = ({
 
     setUploading(true);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, 1000);
       setFormData({ ...formData, image: url });
     } catch (err) {
       console.error('Upload error:', err);
@@ -662,7 +662,7 @@ export const EditProfile = ({
 
     setUploading(true);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(file, 1400);
       setFormData({ ...formData, image: url });
     } catch (err) {
       console.error('Upload error:', err);
