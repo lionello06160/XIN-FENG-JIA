@@ -6,6 +6,7 @@ import { formatRelativeTime, getRatingStats } from '../lib/reviews';
 import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../lib/supabase';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 interface ClientViewProps {
   chefProfile: ChefProfile;
@@ -367,6 +368,65 @@ const DishModal = ({
   );
 };
 
+const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
+  const ref = React.useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start start", "end start"]
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "-100%"]);
+
+  return (
+    <div
+      ref={ref}
+      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] md:min-h-[500px] shadow-2xl border border-gold/10 isolate"
+    >
+      {/* Background Image */}
+      <motion.div
+        className="absolute inset-0 -z-10"
+        style={{ y: backgroundY }}
+      >
+        <img
+          src={chefProfile.image}
+          alt={`主廚形象照：${chefProfile.name}`}
+          className="w-full h-full object-cover animate-zoom-in"
+          style={{
+            animationDuration: '1.5s',
+            objectPosition: 'center 20%',
+            height: '120%' // Increase height to avoid gaps when scrolling
+          }}
+          // @ts-ignore - React 19 / Modern browsers support this
+          fetchPriority="high"
+        />
+      </motion.div>
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent -z-10"></div>
+
+      <motion.div
+        className="flex flex-col p-6 md:p-12 gap-3 md:max-w-2xl animate-fade-in-up"
+        style={{
+          animationDelay: '0.3s',
+          animationFillMode: 'both',
+          y: textY
+        }}
+      >
+        <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md font-display">{chefProfile.name}</h2>
+        {chefProfile.title && (
+          <p className="text-gold/90 text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
+            {chefProfile.title}
+          </p>
+        )}
+        <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-md">
+          {chefProfile.bio}
+        </p>
+      </motion.div>
+    </div>
+  );
+};
+
 export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaItems, reviews, onAddReview }) => {
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
   const showOrderCta = chefProfile.show_order_button && !!chefProfile.order_link;
@@ -418,36 +478,7 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
 
         {/* Hero Section */}
         <div className="py-6 md:py-10 animate-fade-in">
-          <div
-            className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] md:min-h-[500px] shadow-2xl border border-gold/10 isolate"
-          >
-            {/* Background Image */}
-            <img
-              src={chefProfile.image}
-              alt={`主廚形象照：${chefProfile.name}`}
-              className="absolute inset-0 w-full h-full object-cover animate-zoom-in -z-10"
-              style={{
-                animationDuration: '1.5s',
-                objectPosition: 'center 20%'
-              }}
-              // @ts-ignore - React 19 / Modern browsers support this
-              fetchPriority="high"
-            />
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent -z-10"></div>
-
-            <div className="flex flex-col p-6 md:p-12 gap-3 md:max-w-2xl animate-fade-in-up" style={{ animationDelay: '0.3s', animationFillMode: 'both' }}>
-              <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md font-display">{chefProfile.name}</h2>
-              {chefProfile.title && (
-                <p className="text-gold/90 text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
-                  {chefProfile.title}
-                </p>
-              )}
-              <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-md">
-                {chefProfile.bio}
-              </p>
-            </div>
-          </div>
+          <HeroSection chefProfile={chefProfile} />
         </div>
 
         {/* Menu Section Header */}
