@@ -1,3 +1,4 @@
+
 export interface Dish {
   id: string;
   name: string;
@@ -40,6 +41,7 @@ export interface DishReview {
 }
 
 export interface ChefProfile {
+  id?: string;
   name: string;
   title: string;
   bio: string;
@@ -49,6 +51,7 @@ export interface ChefProfile {
     facebook: string;
     line: string;
     email: string;
+    tiktok: string;
   };
   cta_title?: string;
   cta_description?: string;
@@ -61,10 +64,26 @@ export interface ChefProfile {
 }
 
 export interface AppContextType {
+  isAuthenticated: boolean;
+  loading: boolean;
+  chefProfile: ChefProfile | null;
   dishes: Dish[];
-  updateDish: (id: string, updatedDish: Partial<Dish>) => void;
-  deleteDish: (id: string) => void;
-  addDish: (dish: Dish) => void;
-  chefProfile: ChefProfile;
-  updateChefProfile: (profile: Partial<ChefProfile>) => void;
+  reviews: DishReview[];
+  qaItems: QAItem[];
+  fetchData: () => Promise<void>;
+  updateProfile: (data: Partial<ChefProfile>) => Promise<void>;
+  addDish: (data: Omit<Dish, 'id'>) => Promise<void>;
+  updateDish: (id: string, data: Partial<Dish>) => Promise<void>;
+  deleteDish: (id: string) => Promise<void>;
+  reorderDishes: (newDishes: Dish[]) => Promise<void>;
+  addQA: (data: Omit<QAItem, 'id'>) => Promise<void>;
+  updateQA: (id: string, data: Partial<QAItem>) => Promise<void>;
+  deleteQA: (id: string) => Promise<void>;
+  reorderQA: (newItems: QAItem[]) => Promise<void>;
+  addReview: (data: Omit<DishReview, 'id' | 'created_at'>) => Promise<DishReview>;
+  replyReview: (id: string, replyText: string) => Promise<void>;
+  updateReviewStatus: (id: string, status: 'pending' | 'published') => Promise<void>;
+  deleteReview: (id: string) => Promise<void>;
+  handleLoginSuccess: () => void;
+  handleLogout: () => void;
 }

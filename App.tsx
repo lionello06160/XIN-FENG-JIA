@@ -1,28 +1,43 @@
+
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ClientView } from './components/ClientView';
-import { AdminDashboard, EditDish, EditProfile, AnalyticsDashboard, QAManager, EditQAItem, ChangePassword, ReviewsManager } from './components/AdminView';
-import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
-import { ChefProfile, Dish, QAItem, DishReview } from './types';
+import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
+import { ChefProfile, Dish, DishReview, QAItem, AppContextType } from './types';
 import { supabase } from './lib/supabase';
+import { Loader2 } from 'lucide-react';
+import { Toaster, toast } from 'sonner';
+
+// Components
+import { MainLayout } from './components/MainLayout';
 import { LoginView } from './components/LoginView';
-import { Analytics } from "@vercel/analytics/react"
+import {
+  AdminDashboard,
+  EditDish,
+  EditProfile,
+  AnalyticsDashboard,
+  ReviewsManager,
+  QAManager,
+  EditQAItem,
+  ChangePassword
+} from './components/admin';
 
-const App: React.FC = () => {
-  // Centralized State
-  const [chefProfile, setChefProfile] = useState<ChefProfile>(INITIAL_CHEF_PROFILE);
-  const [dishes, setDishes] = useState<Dish[]>(INITIAL_DISHES);
-  const [qaItems, setQaItems] = useState<QAItem[]>([]);
-  const [dishReviews, setDishReviews] = useState<DishReview[]>([]);
-  const [loading, setLoading] = useState(true);
+// Context
+import { AppContext } from './context/AppContext';
+
+function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [chefProfile, setChefProfile] = useState<ChefProfile | null>(null);
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [reviews, setReviews] = useState<DishReview[]>([]);
+  const [qaItems, setQaItems] = useState<QAItem[]>([]);
 
-  // Check existing session
+  // Check existing session on mount
   useEffect(() => {
     const session = localStorage.getItem('chef_session');
     if (session === 'true') {
       setIsAuthenticated(true);
     }
+    fetchData();
   }, []);
 
   const handleLoginSuccess = () => {
@@ -35,454 +50,369 @@ const App: React.FC = () => {
     localStorage.removeItem('chef_session');
   };
 
-  // Fetch initial data
   const fetchData = async () => {
-    setLoading(true);
     try {
-      // Fetch Chef Profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('chef_profile')
-        .select('*')
-        .eq('id', 1)
-        .single();
+      setLoading(true);
 
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-      } else if (profileData) {
+      // Parallel data fetching for performance
+      const [profileResult, qaResult, dishesResult, reviewsResult] = await Promise.all([
+        supabase.from('chef_profile').select('*').single(),
+        supabase.from('qa_items').select('*').order('order_index'),
+        supabase.from('dishes').select('*').order('order_index'),
+        supabase.from('dish_reviews').select('*').order('created_at', { ascending: false })
+      ]);
+
+      if (profileResult.error && profileResult.error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileResult.error);
+      } else if (profileResult.data) {
+        // Map flat DB structure to nested ChefProfile interface
+        const rawProfile = profileResult.data;
         setChefProfile({
-          name: profileData.name,
-          title: profileData.title,
-          bio: profileData.bio,
-          image: profileData.image,
+          id: rawProfile.id,
+          name: rawProfile.name,
+          title: rawProfile.title,
+          bio: rawProfile.bio,
+          image: rawProfile.image,
           socials: {
-            instagram: profileData.instagram || '',
-            facebook: profileData.facebook || '',
-            line: profileData.line || '',
-            email: profileData.email || ''
+            instagram: rawProfile.instagram || '',
+            facebook: rawProfile.facebook || '',
+            line: rawProfile.line || '',
+            email: rawProfile.email || '',
+            tiktok: rawProfile.tiktok || ''
           },
-          cta_title: profileData.cta_title || '預約私廚體驗',
-          cta_description: profileData.cta_description || '在您的私人寓所中，體驗由主廚親自操刀的 8 道式招牌饗宴。',
-          order_link: profileData.order_link || '',
-          show_order_button: !!profileData.show_order_button,
-          show_qa: !!profileData.show_qa,
-          show_cta: profileData.show_cta !== false,
-          show_reviews: profileData.show_reviews !== false,
-          store_name: profileData.store_name ?? ''
+          cta_title: rawProfile.cta_title,
+          cta_description: rawProfile.cta_description,
+          order_link: rawProfile.order_link,
+          show_order_button: rawProfile.show_order_button,
+          show_qa: rawProfile.show_qa,
+          show_cta: rawProfile.show_cta,
+          show_reviews: rawProfile.show_reviews,
+          store_name: rawProfile.store_name
         });
+      } else {
+        // Init profile if not exists
+        const { data: newProfile } = await supabase.from('chef_profile').insert([{
+          name: 'Julian Vane',
+          title: 'Executive Chef',
+          bio: 'Welcome to my culinary world.',
+          image: 'https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?auto=format&fit=crop&q=80&w=2000',
+          store_name: '鑫蘴家',
+          cta_title: 'PRIVATE DINING',
+          cta_description: 'Experience a unique culinary journey.',
+          show_qa: false,
+          show_reviews: true,
+          instagram: '',
+          facebook: '',
+          line: '',
+          email: '',
+          tiktok: '',
+          show_order_button: false,
+          booking_link: '',
+          order_link: ''
+        }]).select().single();
+
+        if (newProfile) {
+          setChefProfile({
+            id: newProfile.id,
+            name: newProfile.name,
+            title: newProfile.title,
+            bio: newProfile.bio,
+            image: newProfile.image,
+            socials: {
+              instagram: newProfile.instagram || '',
+              facebook: newProfile.facebook || '',
+              line: newProfile.line || '',
+              email: newProfile.email || '',
+              tiktok: newProfile.tiktok || ''
+            },
+            cta_title: newProfile.cta_title,
+            cta_description: newProfile.cta_description,
+            order_link: newProfile.order_link,
+            show_order_button: newProfile.show_order_button,
+            show_qa: newProfile.show_qa,
+            show_cta: newProfile.show_cta,
+            show_reviews: newProfile.show_reviews,
+            store_name: newProfile.store_name
+          });
+        }
       }
 
-      // Fetch QA Items
-      const { data: qaData, error: qaError } = await supabase
-        .from('qa_items')
-        .select('*')
-        .order('order_index', { ascending: true });
+      if (qaResult.data) setQaItems(qaResult.data);
+      if (dishesResult.data) setDishes(dishesResult.data);
+      if (reviewsResult.data) setReviews(reviewsResult.data);
 
-      if (qaError) {
-        console.error('Error fetching QA:', qaError);
-      } else if (qaData) {
-        setQaItems(qaData as QAItem[]);
-      }
-
-      // Fetch Dishes
-      const { data: dishesData, error: dishesError } = await supabase
-        .from('dishes')
-        .select('*')
-        .order('order_index', { ascending: true });
-
-      if (dishesError) {
-        console.error('Error fetching dishes:', dishesError);
-      } else if (dishesData) {
-        const normalizedDishes = (dishesData as Dish[]).map((dish) => ({
-          ...dish,
-          show_reviews: dish.show_reviews !== false
-        }));
-        setDishes(normalizedDishes);
-      }
-
-      // Fetch Dish Reviews
-      const { data: reviewsData, error: reviewsError } = await supabase
-        .from('dish_reviews')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (reviewsError) {
-        console.error('Error fetching reviews:', reviewsError);
-      } else if (reviewsData) {
-        setDishReviews(reviewsData as DishReview[]);
-      }
-    } catch (err) {
-      console.error('Data loading error:', err);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('載入資料發生錯誤');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const updateProfile = async (data: Partial<ChefProfile>) => {
+    if (!chefProfile?.id) return;
 
-  // Actions
-  const handleUpdateDish = async (id: string, updatedData: Partial<Dish>) => {
-    const { error } = await supabase
-      .from('dishes')
-      .update(updatedData)
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error updating dish:', error);
-      return;
+    // Map nested ChefProfile to flat DB structure
+    const dbUpdate: any = { ...data };
+    if (data.socials) {
+      dbUpdate.instagram = data.socials.instagram;
+      dbUpdate.facebook = data.socials.facebook;
+      dbUpdate.line = data.socials.line;
+      dbUpdate.email = data.socials.email;
+      dbUpdate.tiktok = data.socials.tiktok;
+      delete dbUpdate.socials;
     }
-    setDishes(prev => prev.map(d => d.id === id ? { ...d, ...updatedData } : d));
-  };
 
-  const handleAddDish = async (newDish: Omit<Dish, 'id'>) => {
-    const { data, error } = await supabase
-      .from('dishes')
-      .insert([{ ...newDish, order_index: dishes.length }])
-      .select()
-      .single();
+    // Clean undefined values
+    Object.keys(dbUpdate).forEach(key => dbUpdate[key] === undefined && delete dbUpdate[key]);
 
-    if (error) {
-      console.error('Error adding dish:', error);
-      return;
-    }
-    if (data) {
-      setDishes(prev => [data as Dish, ...prev]);
-    }
-  };
+    const { error } = await supabase.from('chef_profile').update(dbUpdate).eq('id', chefProfile.id);
 
-  const handleDeleteDish = async (id: string) => {
-    const { error } = await supabase
-      .from('dishes')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting dish:', error);
-      return;
-    }
-    setDishes(prev => prev.filter(d => d.id !== id));
-  };
-
-  const handleReorderDishes = async (newDishes: Dish[]) => {
-    // 1. 同步 index 到物件中
-    const reorderedWithIndex = newDishes.map((dish, index) => ({
-      ...dish,
-      order_index: index
-    }));
-
-    // Optimistic update
-    setDishes(reorderedWithIndex);
-
-    // 2. 更新資料庫
-    const { error } = await supabase
-      .from('dishes')
-      .upsert(reorderedWithIndex);
-
-    if (error) {
-      console.error('Error reordering dishes:', error);
-      alert('排序儲存失敗：' + error.message);
-      // 可選擇在此處恢復舊的排序狀態，但我們先讓用戶看到錯誤
-    }
-  };
-
-  const handleUpdateProfile = async (updatedProfile: Partial<ChefProfile>) => {
-    const flatProfile = {
-      name: updatedProfile.name,
-      title: updatedProfile.title,
-      bio: updatedProfile.bio,
-      image: updatedProfile.image,
-      instagram: updatedProfile.socials?.instagram,
-      facebook: updatedProfile.socials?.facebook,
-      line: updatedProfile.socials?.line,
-      email: updatedProfile.socials?.email,
-      cta_title: updatedProfile.cta_title,
-      cta_description: updatedProfile.cta_description,
-      order_link: updatedProfile.order_link,
-      show_order_button: updatedProfile.show_order_button,
-      show_qa: updatedProfile.show_qa,
-      show_cta: updatedProfile.show_cta,
-      show_reviews: updatedProfile.show_reviews,
-      store_name: updatedProfile.store_name
-    };
-
-    // Remove undefined fields
-    Object.keys(flatProfile).forEach(key => (flatProfile as any)[key] === undefined && delete (flatProfile as any)[key]);
-
-    const { error } = await supabase
-      .from('chef_profile')
-      .update(flatProfile)
-      .eq('id', 1);
-
-    if (error) {
-      console.error('Error updating profile:', error);
-      throw error; // 拋出錯誤以便 AdminView 捕捉並顯示 alert
-    }
-    setChefProfile(prev => ({ ...prev, ...updatedProfile }));
-  };
-
-  const handleUpdateQA = async (id: string, updatedData: Partial<QAItem>) => {
-    const { error } = await supabase
-      .from('qa_items')
-      .update(updatedData)
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error updating QA:', error);
-      return;
-    }
-    setQaItems(prev => prev.map(q => q.id === id ? { ...q, ...updatedData } : q));
-  };
-
-  const handleAddQA = async (newQA: Omit<QAItem, 'id'>) => {
-    const { data, error } = await supabase
-      .from('qa_items')
-      .insert([{ ...newQA, order_index: qaItems.length }])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding QA:', error);
-      return;
-    }
-    if (data) {
-      setQaItems(prev => [...prev, data as QAItem]);
-    }
-  };
-
-  const handleDeleteQA = async (id: string) => {
-    const { error } = await supabase
-      .from('qa_items')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting QA:', error);
-      return;
-    }
-    setQaItems(prev => prev.filter(q => q.id !== id));
-  };
-
-  const handleReorderQA = async (newQA: QAItem[]) => {
-    const reorderedWithIndex = newQA.map((item, index) => ({
-      ...item,
-      order_index: index
-    }));
-    setQaItems(reorderedWithIndex);
-    const { error } = await supabase
-      .from('qa_items')
-      .upsert(reorderedWithIndex);
-
-    if (error) {
-      console.error('Error reordering QA:', error);
-      alert('排序儲存失敗：' + error.message);
-    }
-  };
-
-  const handleAddReview = async (
-    dishId: string,
-    payload: { name: string; rating: number; comment: string }
-  ) => {
-    const { data, error } = await supabase
-      .from('dish_reviews')
-      .insert([
-        {
-          dish_id: dishId,
-          name: payload.name,
-          rating: payload.rating,
-          comment: payload.comment,
-          status: 'pending'
+    if (!error) {
+      setChefProfile(prev => {
+        if (!prev) return null;
+        // Deep merge for local state update
+        const newProfile = { ...prev, ...data };
+        if (data.socials) {
+          newProfile.socials = { ...prev.socials, ...data.socials };
         }
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding review:', error);
-      throw error;
-    }
-    if (data) {
-      setDishReviews(prev => [data as DishReview, ...prev]);
+        return newProfile;
+      });
+      toast.success('個人資料已更新');
+    } else {
+      console.error('Update profile error:', error);
+      toast.error('更新失敗');
     }
   };
 
-  const handleReplyReview = async (reviewId: string, replyText: string) => {
-    const { data, error } = await supabase
-      .from('dish_reviews')
-      .update({ reply_text: replyText, replied_at: new Date().toISOString() })
-      .eq('id', reviewId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error replying review:', error);
-      throw error;
-    }
-    if (data) {
-      setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...(review as DishReview), ...data } : review));
+  const addDish = async (data: Omit<Dish, 'id'>) => {
+    if (!chefProfile?.id) return;
+    const { data: newDish, error } = await supabase.from('dishes').insert([{ ...data, chef_id: chefProfile.id, order_index: dishes.length }]).select().single();
+    if (!error && newDish) {
+      setDishes([...dishes, newDish]);
+      toast.success('菜色已新增');
+    } else {
+      toast.error('新增失敗');
     }
   };
 
-  const handleUpdateReviewStatus = async (reviewId: string, status: 'pending' | 'published') => {
-    const updates = status === 'published'
-      ? { status, published_at: new Date().toISOString() }
-      : { status, published_at: null };
-
-    const { data, error } = await supabase
-      .from('dish_reviews')
-      .update(updates)
-      .eq('id', reviewId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating review status:', error);
-      throw error;
-    }
-    if (data) {
-      setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...(review as DishReview), ...data } : review));
+  const updateDish = async (id: string, data: Partial<Dish>) => {
+    const { error } = await supabase.from('dishes').update(data).eq('id', id);
+    if (!error) {
+      setDishes(dishes.map(d => d.id === id ? { ...d, ...data } : d));
+      toast.success('菜色已更新');
+    } else {
+      toast.error('更新失敗');
     }
   };
 
-  const handleDeleteReview = async (reviewId: string) => {
-    const { error } = await supabase
-      .from('dish_reviews')
-      .update({ is_deleted: true, deleted_at: new Date().toISOString() })
-      .eq('id', reviewId);
-
-    if (error) {
-      console.error('Error deleting review:', error);
-      throw error;
+  const deleteDish = async (id: string) => {
+    const { error } = await supabase.from('dishes').delete().eq('id', id);
+    if (!error) {
+      setDishes(dishes.filter(d => d.id !== id));
+      toast.success('菜色已刪除');
+    } else {
+      toast.error('刪除失敗');
     }
-    setDishReviews(prev => prev.map(review => review.id === reviewId ? { ...review, is_deleted: true, deleted_at: new Date().toISOString() } : review));
+  };
+
+  const reorderDishes = async (newDishes: Dish[]) => {
+    setDishes(newDishes); // Optimistic update
+    const updates = newDishes.map((dish, index) => ({
+      id: dish.id,
+      order_index: index
+    }));
+
+    const { error } = await supabase.from('dishes').upsert(updates);
+    if (error) {
+      console.error('Reorder error:', error);
+      toast.error('排序更新失敗');
+      fetchData(); // Revert on error
+    }
+  };
+
+  const addQA = async (data: Omit<QAItem, 'id'>) => {
+    if (!chefProfile?.id) return;
+    const { data: newItem, error } = await supabase.from('qa_items').insert([{ ...data, chef_id: chefProfile.id, order_index: qaItems.length }]).select().single();
+    if (!error && newItem) {
+      setQaItems([...qaItems, newItem]);
+      toast.success('問答已新增');
+    } else {
+      toast.error('新增失敗');
+    }
+  };
+
+  const updateQA = async (id: string, data: Partial<QAItem>) => {
+    const { error } = await supabase.from('qa_items').update(data).eq('id', id);
+    if (!error) {
+      setQaItems(qaItems.map(item => item.id === id ? { ...item, ...data } : item));
+      toast.success('問答已更新');
+    } else {
+      toast.error('更新失敗');
+    }
+  };
+
+  const deleteQA = async (id: string) => {
+    const { error } = await supabase.from('qa_items').delete().eq('id', id);
+    if (!error) {
+      setQaItems(qaItems.filter(item => item.id !== id));
+      toast.success('問答已刪除');
+    } else {
+      toast.error('刪除失敗');
+    }
+  };
+
+  const reorderQA = async (newItems: QAItem[]) => {
+    setQaItems(newItems);
+    const updates = newItems.map((item, index) => ({
+      id: item.id,
+      order_index: index
+    }));
+    const { error } = await supabase.from('qa_items').upsert(updates);
+    if (error) {
+      toast.error('排序更新失敗');
+      fetchData();
+    }
+  };
+
+  const addReview = async (data: Omit<DishReview, 'id' | 'created_at'>) => {
+    const { data: newReview, error } = await supabase.from('dish_reviews').insert([data]).select().single();
+    if (!error && newReview) {
+      setReviews([newReview, ...reviews]);
+      return newReview;
+    }
+    throw error;
+  };
+
+  const replyReview = async (id: string, replyText: string) => {
+    const { error } = await supabase.from('dish_reviews').update({
+      reply_text: replyText,
+      replied_at: new Date().toISOString()
+    }).eq('id', id);
+
+    if (!error) {
+      setReviews(reviews.map(r => r.id === id ? { ...r, reply_text: replyText, replied_at: new Date().toISOString() } : r));
+      toast.success('回覆已送出');
+    } else {
+      toast.error('回覆失敗');
+    }
+  };
+
+  const updateReviewStatus = async (id: string, status: 'pending' | 'published') => {
+    const { error } = await supabase.from('dish_reviews').update({ status }).eq('id', id);
+    if (!error) {
+      setReviews(reviews.map(r => r.id === id ? { ...r, status } : r));
+      toast.success('狀態已更新');
+    } else {
+      toast.error('更新失敗');
+    }
+  };
+
+  const deleteReview = async (id: string) => {
+    const { error } = await supabase.from('dish_reviews').update({ is_deleted: true }).eq('id', id);
+    if (!error) {
+      setReviews(reviews.map(r => r.id === id ? { ...r, is_deleted: true } : r));
+      toast.success('評價已刪除');
+    } else {
+      toast.error('刪除失敗');
+    }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#181411] text-white font-sans">
-        <div className="relative flex flex-col items-center">
-          {chefProfile.store_name && (
-            <div className="absolute bottom-full mb-4 text-[#a67c52] text-xl font-bold tracking-[0.4em] uppercase">
-              {chefProfile.store_name}
-            </div>
-          )}
-          <div className="loading-flow text-xl font-light tracking-[0.2em] uppercase">LOADING.....</div>
+      <div className="flex items-center justify-center h-screen bg-[#f8f5f2]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="animate-spin text-[#8a7560]" size={48} />
+          <p className="text-[#8a7560] font-medium tracking-widest text-sm animate-pulse">LOADING...</p>
         </div>
       </div>
     );
   }
 
+  // Provide the context value
+  const contextValue: AppContextType = {
+    isAuthenticated,
+    loading,
+    chefProfile,
+    dishes,
+    reviews,
+    qaItems,
+    fetchData,
+    updateProfile,
+    addDish,
+    updateDish,
+    deleteDish,
+    reorderDishes,
+    addQA,
+    updateQA,
+    deleteQA,
+    reorderQA,
+    addReview,
+    replyReview,
+    updateReviewStatus,
+    deleteReview,
+    handleLoginSuccess,
+    handleLogout
+  };
+
   return (
-    <HashRouter>
-      <Analytics />
-      <Routes>
-        {/* Client Side Routes */}
-        <Route
-          path="/"
-          element={
-            <ClientView
-              chefProfile={chefProfile}
-              dishes={dishes}
-              qaItems={qaItems}
-              reviews={dishReviews}
-              onAddReview={handleAddReview}
-            />
-          }
-        />
+    <AppContext.Provider value={contextValue}>
+      <Toaster position="top-center" richColors />
+      <HashRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<MainLayout />} />
+          <Route path="/dish/:id" element={<MainLayout />} />
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/admin" /> : <LoginView onLoginSuccess={handleLoginSuccess} storeName={chefProfile?.store_name} />} />
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            isAuthenticated ? (
-              <AdminDashboard chefProfile={chefProfile} dishes={dishes} onDeleteDish={handleDeleteDish} onReorderDishes={handleReorderDishes} />
-            ) : (
-              <LoginView onLoginSuccess={handleLoginSuccess} storeName={chefProfile.store_name || '鑫蘴家'} />
-            )
-          }
-        />
-        <Route
-          path="/admin/dish/:id"
-          element={
-            isAuthenticated ? (
-              <EditDish dishes={dishes} onSave={handleUpdateDish} onAdd={handleAddDish} />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/profile"
-          element={
-            isAuthenticated ? (
-              <EditProfile profile={chefProfile} onSave={handleUpdateProfile} />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/analytics"
-          element={
-            isAuthenticated ? (
-              <AnalyticsDashboard dishes={dishes} />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/qa"
-          element={
-            isAuthenticated ? (
-              <QAManager qaItems={qaItems} onDeleteQA={handleDeleteQA} onReorderQA={handleReorderQA} />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/reviews"
-          element={
-            isAuthenticated ? (
-              <ReviewsManager
-                reviews={dishReviews}
+          {/* Admin Routes */}
+          {isAuthenticated ? (
+            <>
+              <Route path="/admin" element={chefProfile ? <AdminDashboard
+                chefProfile={chefProfile}
                 dishes={dishes}
-                onReplyReview={handleReplyReview}
-                onUpdateReviewStatus={handleUpdateReviewStatus}
-                onDeleteReview={handleDeleteReview}
-              />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/qa/:id"
-          element={
-            isAuthenticated ? (
-              <EditQAItem qaItems={qaItems} onSave={handleUpdateQA} onAdd={handleAddQA} />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
-        <Route
-          path="/admin/security"
-          element={
-            isAuthenticated ? (
-              <ChangePassword />
-            ) : (
-              <Navigate to="/admin" replace />
-            )
-          }
-        />
+                onDeleteDish={deleteDish}
+                onReorderDishes={reorderDishes}
+              /> : <Loader2 />} />
+              <Route path="/admin/dish/:id" element={<EditDish
+                dishes={dishes}
+                onSave={updateDish}
+                onAdd={addDish}
+              />} />
+              <Route path="/admin/profile" element={chefProfile ? <EditProfile
+                profile={chefProfile}
+                onSave={updateProfile}
+              /> : <Loader2 />} />
+              <Route path="/admin/analytics" element={<AnalyticsDashboard dishes={dishes} />} />
+              <Route path="/admin/reviews" element={<ReviewsManager
+                reviews={reviews}
+                dishes={dishes}
+                onReplyReview={replyReview}
+                onUpdateReviewStatus={updateReviewStatus}
+                onDeleteReview={deleteReview}
+              />} />
+              <Route path="/admin/qa" element={<QAManager
+                qaItems={qaItems}
+                onDeleteQA={deleteQA}
+                onReorderQA={reorderQA}
+              />} />
+              <Route path="/admin/qa/:id" element={<EditQAItem
+                qaItems={qaItems}
+                onSave={updateQA}
+                onAdd={addQA}
+              />} />
+              <Route path="/admin/security" element={<ChangePassword />} />
+            </>
+          ) : (
+            <Route path="/admin/*" element={<Navigate to="/login" />} />
+          )}
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </HashRouter>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </HashRouter>
+    </AppContext.Provider>
   );
-};
+}
 
 export default App;

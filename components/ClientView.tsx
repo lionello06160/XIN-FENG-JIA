@@ -391,10 +391,9 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
         <img
           src={chefProfile.image}
           alt={`主廚形象照：${chefProfile.name}`}
-          className="w-full h-full object-cover animate-zoom-in"
+          className="w-full h-full object-cover animate-zoom-in object-[center_70%] md:object-[center_20%] transition-all duration-1000 ease-in-out"
           style={{
             animationDuration: '1.5s',
-            objectPosition: 'center 20%',
             height: '120%' // Increase height to avoid gaps when scrolling
           }}
           // @ts-ignore - React 19 / Modern browsers support this
@@ -618,9 +617,16 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
                 <Mail size={24} />
               </a>
             )}
+            {chefProfile.socials.tiktok && (
+              <a href={chefProfile.socials.tiktok} target="_blank" rel="noopener noreferrer" className="bg-luxury-card p-3 rounded-full shadow-sm border border-gold/20 text-gold hover:bg-gold hover:text-black transition-colors">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                </svg>
+              </a>
+            )}
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">
-            © 2019 {chefProfile.store_name || '鑫蘴家'}
+            © 2026 {chefProfile.store_name || '鑫蘴家'}
           </p>
           <div className="mt-8 flex justify-center">
             <div className="w-32 h-1 bg-white/10 rounded-full"></div>
