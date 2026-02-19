@@ -381,7 +381,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
   return (
     <div
       ref={ref}
-      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] md:min-h-[500px] shadow-2xl border border-gold/10 isolate"
+      className="relative flex flex-col justify-end overflow-hidden w-full aspect-[3/4] md:aspect-[21/9] min-h-[420px] md:min-h-[500px] shadow-2xl isolate"
     >
       {/* Background Image */}
       <motion.div
@@ -405,7 +405,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
       <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent -z-10"></div>
 
       <motion.div
-        className="flex flex-col p-6 md:p-12 gap-3 md:max-w-2xl animate-fade-in-up"
+        className="flex flex-col p-6 md:p-12 gap-3 w-full md:max-w-4xl animate-fade-in-up"
         style={{
           animationDelay: '0.3s',
           animationFillMode: 'both',
@@ -418,7 +418,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
             {chefProfile.title}
           </p>
         )}
-        <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-md">
+        <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-2xl">
           {chefProfile.bio}
         </p>
       </motion.div>
@@ -473,15 +473,13 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
         </div>
       </nav>
 
+      {/* Hero Section */}
+      <HeroSection chefProfile={chefProfile} />
+
       <main className={`max-w-6xl mx-auto ${showOrderCta ? 'pb-24' : 'pb-12'} px-4 md:px-8`}>
 
-        {/* Hero Section */}
-        <div className="py-6 md:py-10 animate-fade-in">
-          <HeroSection chefProfile={chefProfile} />
-        </div>
-
         {/* Menu Section Header */}
-        <div className="flex items-center justify-center gap-6 px-4 pt-8 pb-4">
+        <div className="flex items-center justify-center gap-6 px-4 pt-12 pb-4">
           <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
           <h3 className="text-white text-2xl font-bold tracking-[0.2em] text-center whitespace-nowrap uppercase font-display">主廚精選</h3>
           <div className="h-[1px] flex-1 bg-gold/30 rounded-full"></div>
