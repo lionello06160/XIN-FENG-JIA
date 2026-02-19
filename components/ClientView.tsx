@@ -381,7 +381,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
   return (
     <div
       ref={ref}
-      className="relative flex flex-col justify-end overflow-hidden w-full aspect-[3/4] md:aspect-[21/9] min-h-[420px] md:min-h-[500px] shadow-2xl isolate"
+      className="relative flex flex-col justify-end overflow-hidden w-full aspect-[3/4] md:aspect-[21/9] min-h-[420px] md:min-h-[500px] md:max-h-[640px] shadow-2xl isolate"
     >
       {/* Background Image */}
       <motion.div
