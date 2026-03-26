@@ -6,7 +6,7 @@ import { formatRelativeTime, getRatingStats } from '../lib/reviews';
 import { Camera, Globe, Mail, Utensils, User, X, CheckCircle, Clock, Instagram, Facebook, MessageCircle, ShoppingCart, Sparkles, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../lib/supabase';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 
 interface ClientViewProps {
   chefProfile: ChefProfile;
@@ -27,18 +27,18 @@ const ratingLabels: Record<number, string> = {
   5: '極致滿意'
 };
 
-const DishModal = ({
-  dish,
-  reviews,
-  showReviews,
-  onAddReview,
-  onClose
-}: {
+const DishModal: React.FC<{
   dish: Dish;
   reviews: DishReview[];
   showReviews: boolean;
   onAddReview: (dishId: string, review: { name: string; rating: number; comment: string }) => Promise<void>;
   onClose: () => void;
+}> = ({
+  dish,
+  reviews,
+  showReviews,
+  onAddReview,
+  onClose
 }) => {
   if (!dish) return null;
   const [rating, setRating] = useState(0);
@@ -108,30 +108,54 @@ const DishModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      <div className="relative w-full max-w-xl bg-white dark:bg-[#2d241a] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh] animate-zoom-in duration-300 motion-reduce:animate-none motion-reduce:transition-none" role="dialog" aria-modal="true" aria-label={`${dish.name} 詳細內容`}>
+    <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+        onClick={onClose} 
+      />
+      <motion.div 
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="relative w-full max-w-2xl bg-white dark:bg-[#1e1e1e] rounded-t-3xl md:rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[92vh] md:h-auto md:max-h-[85vh] z-10" 
+        role="dialog" 
+        aria-modal="true" 
+        aria-label={`${dish.name} 詳細內容`}
+      >
+        {/* Drag Handle for Mobile */}
+        <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto my-3 md:hidden shrink-0" onClick={onClose}></div>
 
-        {/* Close Button */}
-        <div className="absolute top-4 right-4 z-30">
-          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-black/20 backdrop-blur-md text-white border border-white/20 transition-colors motion-reduce:transition-none hover:bg-black/40">
+        {/* Close Button (Desktop Only) */}
+        <div className="absolute top-4 right-4 z-30 hidden md:block">
+          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-black/20 backdrop-blur-md text-white border border-white/20 transition-all hover:bg-black/40 hover:scale-110">
             <X size={20} />
           </button>
         </div>
 
-        {/* Hero Image */}
-        <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden">
-          <img
-            src={dish.image}
-            alt={`菜色圖片：${dish.name}`}
-            className="w-full h-full object-cover animate-scale-down"
-            style={{ animationDuration: '1.5s' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        {/* Mobile Close Button */}
+        <div className="absolute top-4 right-4 z-30 md:hidden">
+          <button onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-black/10 text-gray-500">
+            <X size={18} />
+          </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 bg-white">
+        <div className="flex flex-col md:flex-row h-full overflow-hidden">
+          {/* Hero Image */}
+          <div className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-square shrink-0 overflow-hidden">
+            <img
+              src={dish.image}
+              alt={`菜色圖片：${dish.name}`}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 md:py-8 bg-white dark:bg-[#1e1e1e]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               {dish.available ? (
@@ -362,8 +386,9 @@ const DishModal = ({
               </section>
             )}
           </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
@@ -381,7 +406,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
   return (
     <div
       ref={ref}
-      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[420px] md:min-h-[500px] shadow-2xl border border-gold/10 isolate"
+      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[460px] md:min-h-[560px] shadow-2xl border border-white/5 isolate"
     >
       {/* Background Image */}
       <motion.div
@@ -391,34 +416,31 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
         <img
           src={chefProfile.image}
           alt={`主廚形象照：${chefProfile.name}`}
-          className="w-full h-full object-cover animate-zoom-in object-[center_70%] md:object-[center_20%] transition-all duration-1000 ease-in-out"
-          style={{
-            animationDuration: '1.5s',
-            height: '120%' // Increase height to avoid gaps when scrolling
-          }}
-          // @ts-ignore - React 19 / Modern browsers support this
+          className="w-full h-full object-cover object-[center_70%] md:object-[center_20%] transition-all duration-1000 ease-in-out"
+          style={{ height: '120%' }}
+          // @ts-ignore
           fetchPriority="high"
         />
       </motion.div>
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/40 to-transparent -z-10"></div>
+      {/* Luxury Gradient Overlay - Deeper and more nuanced */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#121212]/80 via-transparent to-transparent -z-10"></div>
 
       <motion.div
-        className="flex flex-col p-6 md:p-12 gap-3 w-full md:max-w-4xl animate-fade-in-up"
-        style={{
-          animationDelay: '0.3s',
-          animationFillMode: 'both',
-          y: textY
-        }}
+        className="flex flex-col p-6 md:p-14 gap-4 w-full md:max-w-4xl"
+        style={{ y: textY }}
       >
-        <h2 className="text-white text-4xl md:text-5xl font-black leading-tight drop-shadow-md font-display">{chefProfile.name}</h2>
+        <h2 className="text-white text-[clamp(2.5rem,8vw,4rem)] font-black leading-[1.1] drop-shadow-2xl font-display tracking-tightest">
+          {chefProfile.name}
+        </h2>
         {chefProfile.title && (
-          <p className="text-gold/90 text-sm md:text-base font-semibold tracking-[0.2em] uppercase">
+          <p className="text-gold/90 text-sm md:text-lg font-bold tracking-[0.3em] uppercase border-l-2 border-gold/40 pl-4 ml-1">
             {chefProfile.title}
           </p>
         )}
-        <p className="text-white/80 text-sm md:text-base font-light leading-relaxed max-w-3xl">
+        <div className="h-px w-24 bg-gold/30 mt-2 mb-1"></div>
+        <p className="text-white/80 text-base md:text-lg font-light leading-relaxed max-w-2xl text-pretty">
           {chefProfile.bio}
         </p>
       </motion.div>
@@ -651,17 +673,18 @@ export const ClientView: React.FC<ClientViewProps> = ({ chefProfile, dishes, qaI
       )}
 
       {/* Modal Overlay */}
-      {
-        selectedDish && (
+      <AnimatePresence mode="wait">
+        {selectedDish && (
           <DishModal
+            key="dish-modal"
             dish={selectedDish}
             reviews={getReviewsForDish(selectedDish.id)}
             showReviews={showReviews && selectedDish.show_reviews !== false}
             onAddReview={onAddReview}
             onClose={() => setSelectedDish(null)}
           />
-        )
-      }
-    </div >
+        )}
+      </AnimatePresence>
+    </div>
   );
 };

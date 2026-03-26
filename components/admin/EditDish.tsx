@@ -80,38 +80,47 @@ export const EditDish = ({
             title={isNew ? "新增菜色" : "編輯菜色詳情"}
             backTo="/admin"
         >
-            <div className="px-4 py-4">
-                {/* Image Upload */}
-                <div className="relative group mb-6">
-                    <div
-                        className="w-full bg-center bg-no-repeat bg-contain flex flex-col justify-end overflow-hidden bg-[#f8f5f2] rounded-xl min-h-[320px] md:min-h-[400px] shadow-inner border border-gray-100"
-                        style={{ backgroundImage: `url("${formData.image}")` }}
-                    ></div>
-                    <div
-                        className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl transition-opacity cursor-pointer"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <div className="bg-white/90 p-3 rounded-full flex items-center gap-2 shadow-lg">
-                            {uploading ? (
-                                <Loader2 className="text-admin-primary animate-spin" size={20} />
-                            ) : (
-                                <Camera className="text-admin-primary" size={20} />
-                            )}
-                            <span className="text-sm font-bold text-gray-800">
-                                {uploading ? '正在上傳...' : '更換相片'}
-                            </span>
+            <div className="p-4 md:p-6 lg:p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left Column: Image Preview (Sticky on Desktop) */}
+                    <div className="lg:col-span-4 lg:sticky lg:top-8 space-y-4">
+                        <div className="relative group overflow-hidden rounded-2xl shadow-xl border border-gray-100 bg-[#f8f5f2]">
+                            <div
+                                className="w-full aspect-square bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105"
+                                style={{ backgroundImage: `url("${formData.image}")` }}
+                            ></div>
+                            <div
+                                className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-[2px]"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <div className="bg-white/90 p-4 rounded-full flex items-center gap-2 shadow-2xl transform scale-90 group-hover:scale-100 transition-transform">
+                                    {uploading ? (
+                                        <Loader2 className="text-admin-primary animate-spin" size={24} />
+                                    ) : (
+                                        <Camera className="text-admin-primary" size={24} />
+                                    )}
+                                    <span className="text-sm font-black text-gray-800">
+                                        {uploading ? '正在上傳...' : '更換相片'}
+                                    </span>
+                                </div>
+                            </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleFileChange}
+                            />
+                        </div>
+                        <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hidden lg:block">
+                            <p className="text-[10px] text-[#8a7560] font-bold uppercase tracking-widest mb-2">相片規格建議</p>
+                            <p className="text-xs text-gray-400 leading-relaxed">建議使用 4:3 或 1:1 的高品質照片，檔案大小不超過 5MB。</p>
                         </div>
                     </div>
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleFileChange}
-                    />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-48">
+                    {/* Right Column: Form Fields */}
+                    <div className="lg:col-span-8 space-y-8 pb-48">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                         <label className="flex flex-col w-full gap-2">
                             <p className="text-[#181411] text-sm font-bold tracking-wider">菜色名稱</p>
@@ -269,11 +278,13 @@ export const EditDish = ({
                                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold"></div>
                                     </label>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
             <div className="sticky bottom-24 z-40 mt-10 -mx-4 md:-mx-8">
                 <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 md:px-8 py-4 shadow-[0_-10px_30px_-20px_rgba(0,0,0,0.35)]">
