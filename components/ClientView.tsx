@@ -406,7 +406,7 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
   return (
     <div
       ref={ref}
-      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[460px] md:min-h-[560px] shadow-2xl border border-white/5 isolate"
+      className="relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[520px] bg-[#121212] md:min-h-[720px] shadow-2xl border border-white/5 isolate"
     >
       {/* Background Image */}
       <motion.div
@@ -415,32 +415,38 @@ const HeroSection = ({ chefProfile }: { chefProfile: ChefProfile }) => {
       >
         <img
           src={chefProfile.image}
+          alt=""
+          aria-hidden="true"
+          className="hidden md:block absolute inset-0 w-full h-full object-cover object-top scale-105 blur-sm opacity-45"
+        />
+        <img
+          src={chefProfile.image}
           alt={`主廚形象照：${chefProfile.name}`}
-          className="w-full h-full object-cover object-[center_70%] md:object-[center_20%] transition-all duration-1000 ease-in-out"
-          style={{ height: '120%' }}
+          className="relative z-10 w-full h-full object-cover object-[center_22%] md:w-auto md:max-w-none md:mx-auto md:object-contain md:object-top md:[mask-image:linear-gradient(to_right,transparent_0%,black_12%,black_88%,transparent_100%)] transition-all duration-1000 ease-in-out"
+          style={{ height: '100%' }}
           // @ts-ignore
           fetchPriority="high"
         />
       </motion.div>
 
       {/* Luxury Gradient Overlay - Deeper and more nuanced */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-[#121212]/60 to-transparent -z-10"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#121212]/80 via-transparent to-transparent -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent from-[28%] via-[#121212]/80 via-[62%] to-[#121212] md:from-[42%] md:via-[74%] -z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#121212]/55 via-[#121212]/20 to-transparent md:from-[#121212]/45 md:via-[#121212]/10 -z-10"></div>
 
       <motion.div
-        className="flex flex-col p-6 md:p-14 gap-4 w-full md:max-w-4xl"
+        className="flex flex-col p-6 pt-0 md:px-14 md:pt-14 md:pb-10 gap-3 md:gap-4 w-full md:max-w-3xl"
         style={{ y: textY }}
       >
-        <h2 className="text-white text-[clamp(2.5rem,8vw,4rem)] font-black leading-[1.1] drop-shadow-2xl font-display tracking-tightest">
+        <h2 className="text-white text-[clamp(2.2rem,10vw,4rem)] font-black leading-[1.1] drop-shadow-2xl font-display tracking-tightest">
           {chefProfile.name}
         </h2>
         {chefProfile.title && (
-          <p className="text-gold/90 text-sm md:text-lg font-bold tracking-[0.3em] uppercase border-l-2 border-gold/40 pl-4 ml-1">
+          <p className="text-gold/90 text-xs md:text-lg font-bold tracking-[0.3em] uppercase border-l-2 border-gold/40 pl-4 ml-1">
             {chefProfile.title}
           </p>
         )}
         <div className="h-px w-24 bg-gold/30 mt-2 mb-1"></div>
-        <p className="text-white/80 text-base md:text-lg font-light leading-relaxed max-w-2xl text-pretty">
+        <p className="text-white/80 text-sm md:text-lg font-light leading-relaxed max-w-2xl md:max-w-4xl text-pretty">
           {chefProfile.bio}
         </p>
       </motion.div>
