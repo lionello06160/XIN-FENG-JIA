@@ -5,6 +5,7 @@ import { ChefProfile, Dish, DishReview, QAItem, AppContextType } from './types';
 import { supabase } from './lib/supabase';
 import { Loader2 } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
+import { INITIAL_CHEF_PROFILE, INITIAL_DISHES } from './constants';
 
 // Components
 import { MainLayout } from './components/MainLayout';
@@ -22,6 +23,29 @@ import {
 
 // Context
 import { AppContext } from './context/AppContext';
+
+const mapChefProfile = (rawProfile: any): ChefProfile => ({
+  id: rawProfile.id,
+  name: rawProfile.name,
+  title: rawProfile.title,
+  bio: rawProfile.bio,
+  image: rawProfile.image,
+  socials: {
+    instagram: rawProfile.instagram || '',
+    facebook: rawProfile.facebook || '',
+    line: rawProfile.line || '',
+    email: rawProfile.email || '',
+    tiktok: rawProfile.tiktok || ''
+  },
+  cta_title: rawProfile.cta_title,
+  cta_description: rawProfile.cta_description,
+  order_link: rawProfile.order_link,
+  show_order_button: rawProfile.show_order_button,
+  show_qa: rawProfile.show_qa,
+  show_cta: rawProfile.show_cta,
+  show_reviews: rawProfile.show_reviews,
+  store_name: rawProfile.store_name
+});
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -65,30 +89,7 @@ function App() {
       if (profileResult.error && profileResult.error.code !== 'PGRST116') {
         console.error('Error fetching profile:', profileResult.error);
       } else if (profileResult.data) {
-        // Map flat DB structure to nested ChefProfile interface
-        const rawProfile = profileResult.data;
-        setChefProfile({
-          id: rawProfile.id,
-          name: rawProfile.name,
-          title: rawProfile.title,
-          bio: rawProfile.bio,
-          image: rawProfile.image,
-          socials: {
-            instagram: rawProfile.instagram || '',
-            facebook: rawProfile.facebook || '',
-            line: rawProfile.line || '',
-            email: rawProfile.email || '',
-            tiktok: rawProfile.tiktok || ''
-          },
-          cta_title: rawProfile.cta_title,
-          cta_description: rawProfile.cta_description,
-          order_link: rawProfile.order_link,
-          show_order_button: rawProfile.show_order_button,
-          show_qa: rawProfile.show_qa,
-          show_cta: rawProfile.show_cta,
-          show_reviews: rawProfile.show_reviews,
-          store_name: rawProfile.store_name
-        });
+        setChefProfile(mapChefProfile(profileResult.data));
       } else {
         // Init profile if not exists
         const { data: newProfile } = await supabase.from('chef_profile').insert([{
@@ -112,28 +113,7 @@ function App() {
         }]).select().single();
 
         if (newProfile) {
-          setChefProfile({
-            id: newProfile.id,
-            name: newProfile.name,
-            title: newProfile.title,
-            bio: newProfile.bio,
-            image: newProfile.image,
-            socials: {
-              instagram: newProfile.instagram || '',
-              facebook: newProfile.facebook || '',
-              line: newProfile.line || '',
-              email: newProfile.email || '',
-              tiktok: newProfile.tiktok || ''
-            },
-            cta_title: newProfile.cta_title,
-            cta_description: newProfile.cta_description,
-            order_link: newProfile.order_link,
-            show_order_button: newProfile.show_order_button,
-            show_qa: newProfile.show_qa,
-            show_cta: newProfile.show_cta,
-            show_reviews: newProfile.show_reviews,
-            store_name: newProfile.store_name
-          });
+          setChefProfile(mapChefProfile(newProfile));
         }
       }
 
@@ -145,6 +125,8 @@ function App() {
       console.error('Error fetching data:', error);
       toast.error('載入資料發生錯誤');
     } finally {
+      setChefProfile(current => current || INITIAL_CHEF_PROFILE);
+      setDishes(current => current.length ? current : INITIAL_DISHES);
       setLoading(false);
     }
   };
