@@ -50,7 +50,7 @@ export const EditProfile = ({
 
     return (
         <AdminLayout title="主廚個人資料管理">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-40">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-2 md:pb-40">
                 <div className="lg:col-span-1">
                     <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-6 sticky top-24">
                         {/* Avatar */}
@@ -317,8 +317,8 @@ export const EditProfile = ({
                 </div>
             </div>
 
-            <div className="sticky bottom-24 z-40 mt-10 -mx-4 md:-mx-8">
-                <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 md:px-8 py-4 shadow-[0_-10px_30px_-20px_rgba(0,0,0,0.35)]">
+            <div className="mt-4 md:mt-10 -mx-4 md:-mx-8 md:sticky md:bottom-0 md:z-40">
+                <div className="bg-white border border-gray-100 md:bg-white/95 md:backdrop-blur-md md:border-x-0 md:border-b-0 md:border-t px-4 md:px-8 py-4 rounded-3xl md:rounded-none shadow-sm md:shadow-[0_-10px_30px_-20px_rgba(0,0,0,0.35)]">
                     <button
                         onClick={handleSave}
                         disabled={isSubmitting}
