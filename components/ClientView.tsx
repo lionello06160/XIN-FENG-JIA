@@ -121,45 +121,45 @@ const DishModal: React.FC<{
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="relative w-full max-w-2xl bg-white dark:bg-[#1e1e1e] rounded-t-3xl md:rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[92vh] md:h-auto md:max-h-[85vh] z-10" 
+        className="relative w-full max-w-3xl rounded-t-3xl md:rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[92vh] md:h-auto md:max-h-[90vh] z-10 bg-[#f8f3eb] border border-[#e3d6c3]" 
         role="dialog" 
         aria-modal="true" 
         aria-label={`${dish.name} 詳細內容`}
       >
         {/* Drag Handle for Mobile */}
-        <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto my-3 md:hidden shrink-0" onClick={onClose}></div>
+        <div className="w-12 h-1.5 bg-[#c8b59d] rounded-full mx-auto my-3 md:hidden shrink-0" onClick={onClose}></div>
 
         {/* Close Button (Desktop Only) */}
         <div className="absolute top-4 right-4 z-30 hidden md:block">
-          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-black/20 backdrop-blur-md text-white border border-white/20 transition-all hover:bg-black/40 hover:scale-110">
+          <button onClick={onClose} className="flex items-center justify-center w-10 h-10 rounded-full bg-[#2f241a]/80 backdrop-blur-md text-[#fff7ed] border border-white/10 transition-all hover:bg-[#1f1711] hover:scale-110">
             <X size={20} />
           </button>
         </div>
 
         {/* Mobile Close Button */}
         <div className="absolute top-4 right-4 z-30 md:hidden">
-          <button onClick={onClose} className="flex items-center justify-center w-8 h-8 rounded-full bg-black/10 text-gray-500">
+          <button onClick={onClose} className="flex items-center justify-center w-9 h-9 rounded-full bg-[#2f241a]/80 text-[#fff7ed] border border-white/10">
             <X size={18} />
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Hero Image */}
-          <div className="relative w-full md:w-1/2 aspect-[4/3] md:aspect-square shrink-0 overflow-hidden">
+          <div className="relative w-full aspect-[4/3] md:aspect-[16/8] shrink-0 overflow-hidden">
             <img
               src={dish.image}
               alt={`菜色圖片：${dish.name}`}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2d2014]/70 via-[#2d2014]/20 to-transparent"></div>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 md:py-8 bg-white dark:bg-[#1e1e1e]">
+          <div className="flex-1 overflow-y-auto px-6 py-5 md:px-8 md:py-8 bg-[#f8f3eb] text-[#2b221c]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               {dish.available ? (
-                <div className="flex items-center gap-2 px-3 py-1 bg-admin-primary/10 rounded-full">
+                <div className="flex items-center gap-2 px-3 py-1 bg-[#f27f0d]/10 border border-[#f27f0d]/20 rounded-full">
                   <div className="w-2 h-2 rounded-full bg-admin-primary"></div>
                   <span className="text-admin-primary text-xs font-bold tracking-wider uppercase">目前可預訂</span>
                 </div>
@@ -180,7 +180,7 @@ const DishModal: React.FC<{
 
           <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
             <div className="flex items-center gap-2">
-              <h1 className="text-[#181411] text-3xl font-bold leading-tight font-display">{dish.name}</h1>
+              <h1 className="text-[#24180f] text-3xl md:text-4xl font-bold leading-tight font-display">{dish.name}</h1>
               {!!dish.spiciness && dish.spiciness > 0 && (
                 <div className="flex gap-0.5 mb-1">
                   {Array.from({ length: dish.spiciness }).map((_, i) => (
@@ -190,14 +190,14 @@ const DishModal: React.FC<{
               )}
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-admin-primary text-2xl font-bold">NT$ {dish.price.toLocaleString()}</span>
+              <span className="text-admin-primary text-2xl md:text-3xl font-bold">NT$ {dish.price.toLocaleString()}</span>
               {dish.originalPrice && (
-                <span className="text-gray-400 text-sm line-through">NT$ {dish.originalPrice.toLocaleString()}</span>
+                <span className="text-[#8e7b67] text-sm line-through">NT$ {dish.originalPrice.toLocaleString()}</span>
               )}
             </div>
           </div>
 
-          <div className="h-px bg-gray-100 mb-6"></div>
+          <div className="h-px bg-[#dbcbb8] mb-6"></div>
 
           <div className="space-y-8 pb-8">
             <section className="animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
@@ -205,7 +205,7 @@ const DishModal: React.FC<{
                 <Utensils className="text-admin-primary" size={20} />
                 主廚靈感
               </h3>
-              <p className="text-gray-600 leading-relaxed text-base">
+              <p className="text-[#5e5146] leading-relaxed text-base">
                 {dish.inspiration || dish.description}
               </p>
             </section>
@@ -217,9 +217,9 @@ const DishModal: React.FC<{
               </h3>
               <ul className="grid grid-cols-2 gap-3">
                 {dish.ingredients.map((ing, idx) => (
-                  <li key={idx} className="flex items-center gap-2 bg-admin-bg p-3 rounded-lg border border-gray-100">
-                    <CheckCircle className="text-gray-400" size={16} />
-                    <span className="text-sm text-gray-700">{ing}</span>
+                  <li key={idx} className="flex items-center gap-2 bg-white/85 p-3 rounded-lg border border-[#e4d8c9] shadow-sm">
+                    <CheckCircle className="text-[#b39a82]" size={16} />
+                    <span className="text-sm text-[#4b3e33]">{ing}</span>
                   </li>
                 ))}
               </ul>
@@ -232,12 +232,12 @@ const DishModal: React.FC<{
                   食客評價
                 </h3>
 
-                <div className="bg-admin-bg border border-gray-100 rounded-xl p-4 space-y-4">
+                <div className="bg-white/90 border border-[#e4d8c9] rounded-xl p-4 space-y-4 shadow-sm">
                   <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] gap-4 items-center">
                     <div>
                       <div className="text-3xl font-bold text-[#181411]">{averageDisplay}</div>
                       <StarRating rating={ratingStats.average} size={16} />
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-[#7d6c5c] mt-1">
                         {ratingStats.count ? `${ratingStats.count} 則評價` : '尚無評價'}
                       </div>
                     </div>
@@ -247,14 +247,14 @@ const DishModal: React.FC<{
                         const width = (count / maxRatingCount) * 100;
                         return (
                           <div key={star} className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-gray-500 w-10">{star} 星</span>
-                            <div className="flex-1 h-2 bg-white rounded-full border border-gray-100 overflow-hidden">
+                            <span className="text-xs font-semibold text-[#6f5e4f] w-10">{star} 星</span>
+                            <div className="flex-1 h-2 bg-[#f4ede4] rounded-full border border-[#e8dccd] overflow-hidden">
                               <div
                                 className="h-full bg-gold/70 transition-all duration-500 motion-reduce:transition-none"
                                 style={{ width: `${width}%` }}
                               ></div>
                             </div>
-                            <span className="text-xs text-gray-400 w-6 text-right">{count}</span>
+                            <span className="text-xs text-[#8e7b67] w-6 text-right">{count}</span>
                           </div>
                         );
                       })}
@@ -288,7 +288,7 @@ const DishModal: React.FC<{
                           );
                         })}
                       </div>
-                      <span className="text-xs text-gray-500">{ratingLabel}</span>
+                      <span className="text-xs text-[#7d6c5c]">{ratingLabel}</span>
                     </div>
                   </div>
 
@@ -296,7 +296,7 @@ const DishModal: React.FC<{
                     <label className="flex flex-col gap-2">
                       <span className="text-sm font-semibold text-[#181411]">姓名</span>
                       <input
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-gray-400 outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
+                        className="w-full rounded-lg border border-[#d9cbb9] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#ab9987] outline-none focus:border-gold focus:ring-1 focus:ring-gold/40"
                         placeholder="請輸入姓名"
                         value={reviewerName}
                         onChange={(event) => setReviewerName(event.target.value)}
@@ -305,7 +305,7 @@ const DishModal: React.FC<{
                     <label className="flex flex-col gap-2 md:col-span-2">
                       <span className="text-sm font-semibold text-[#181411]">評語</span>
                       <textarea
-                        className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-gray-400 outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 min-h-[120px] resize-none"
+                        className="w-full rounded-lg border border-[#d9cbb9] bg-white px-3 py-2 text-sm text-[#181411] placeholder:text-[#ab9987] outline-none focus:border-gold focus:ring-1 focus:ring-gold/40 min-h-[120px] resize-none"
                         placeholder="分享您對這道料理的感受"
                         value={comment}
                         onChange={(event) => setComment(event.target.value)}
@@ -314,7 +314,7 @@ const DishModal: React.FC<{
                   </div>
 
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                    <span className="text-xs text-gray-500">請填寫 2 字以上姓名與 6 字以上評語</span>
+                    <span className="text-xs text-[#7d6c5c]">請填寫 2 字以上姓名與 6 字以上評語</span>
                     <div className="flex items-center gap-3">
                       {submitError && (
                         <span className="text-xs text-red-500 font-semibold">{submitError}</span>
@@ -337,28 +337,28 @@ const DishModal: React.FC<{
                   <div className="text-sm font-semibold text-[#181411]">最新評價</div>
                   {latestReviews.length ? (
                     <>
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-[11px] text-[#8e7b67]">
                         已顯示 {Math.min(visibleReviews.length, latestReviews.length)} / {latestReviews.length}
                       </div>
                       {visibleReviews.map((review, idx) => (
-                        <div key={review.id} className="bg-admin-bg border border-gray-100 rounded-xl p-4 animate-fade-in-up" style={{ animationDelay: `${idx * 100 + 500}ms`, animationFillMode: 'both' }}>
+                        <div key={review.id} className="bg-white/90 border border-[#e4d8c9] rounded-xl p-4 animate-fade-in-up shadow-sm" style={{ animationDelay: `${idx * 100 + 500}ms`, animationFillMode: 'both' }}>
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
                               <StarRating rating={review.rating} size={14} />
                               <span className="text-sm font-semibold text-[#181411]">{review.name}</span>
                             </div>
-                            <div className="flex items-center gap-1 text-xs text-gray-400">
+                            <div className="flex items-center gap-1 text-xs text-[#8e7b67]">
                               <Clock size={14} />
                               <span>{formatRelativeTime(review.created_at)}</span>
                             </div>
                           </div>
-                          <p className="text-sm text-gray-600 mt-2 leading-relaxed">{review.comment}</p>
+                          <p className="text-sm text-[#5e5146] mt-2 leading-relaxed">{review.comment}</p>
                           {review.reply_text && (
                             <div className="mt-3 border-l-2 border-gold/30 pl-3">
                               <div className="text-xs font-semibold text-gold">主廚回覆</div>
-                              <p className="text-xs text-gray-600 mt-1 leading-relaxed">{review.reply_text}</p>
+                              <p className="text-xs text-[#5e5146] mt-1 leading-relaxed">{review.reply_text}</p>
                               {review.replied_at && (
-                                <div className="text-[10px] text-gray-400 mt-1">
+                                <div className="text-[10px] text-[#8e7b67] mt-1">
                                   {formatRelativeTime(review.replied_at)}
                                 </div>
                               )}
@@ -380,7 +380,7 @@ const DishModal: React.FC<{
                       )}
                     </>
                   ) : (
-                    <div className="text-sm text-gray-400">成為第一位評論的人</div>
+                    <div className="text-sm text-[#8e7b67]">成為第一位評論的人</div>
                   )}
                 </div>
               </section>
